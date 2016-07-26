@@ -1,25 +1,33 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System;
+using Assets.Scripts.DataStructures;
 
 public class UpgradeSceneController : MonoBehaviour {
 
     public enum States { Intro, Playing, Stopping };
     public States SceneState = States.Intro;
     private float StateStart;
+    private CanvasGroup HUD;
 
     public float PlayTime;
 
-    public static UpgradeSceneController instance;
-    void Awake()
+    public List<FallingUpgrade> Upgrades;
+
+    private List<GameObject> _upgradeGameObjects = new List<GameObject>();
+
+    [Serializable]
+    public class FallingUpgrade
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else if (instance != this)
-        {
-            Destroy(gameObject);
-        }
+        public PlayerState.Upgrade Upgrade;
+        public Sprite Sprite;
+        public float Rarity;
+    }
+
+    void Start() {
+        HUD = GameObject.FindGameObjectWithTag("HUD").GetComponent<CanvasGroup>();
+        HideHUD();
     }
 
     IEnumerator SpawnUpgrades() {
@@ -34,7 +42,16 @@ public class UpgradeSceneController : MonoBehaviour {
     public void StartGame()
     {
         Destroy(GameObject.FindGameObjectWithTag("Modal"));
+        ShowHUD();
         SceneState = States.Playing;
         StateStart = Time.fixedTime;
+    }
+
+    private void HideHUD() {
+        HUD.alpha = 0;
+    }
+
+    private void ShowHUD() {
+        HUD.alpha = 1;
     }
 }
