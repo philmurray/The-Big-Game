@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using Assets.Scripts.DataStructures;
+using UnityEngine.SceneManagement;
 
 public class UpgradeSceneController : MonoBehaviour {
 
@@ -24,6 +25,7 @@ public class UpgradeSceneController : MonoBehaviour {
 
     public States SceneState = States.Intro;
     public float PlayTime;
+    public float StopTime;
     public float UpgradeTimeBase;
     
     public float UpgradeTimeRandom;
@@ -74,8 +76,14 @@ public class UpgradeSceneController : MonoBehaviour {
 
             yield return new WaitForSeconds(UpgradeTimeBase + UnityEngine.Random.Range(0, UpgradeTimeRandom));
         }
+        StartCoroutine(StopGame());
+    }
+
+    IEnumerator StopGame() {
         SceneState = States.Stopping;
         StateStart = Time.fixedTime;
+        yield return new WaitForSeconds(StopTime);
+        SceneManager.LoadScene("Building");
     }
 
     public void StartGame()
