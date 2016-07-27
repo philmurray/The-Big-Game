@@ -35,7 +35,7 @@ public class HUDController : MonoBehaviour {
         Refresh();
 	}
 
-    void Refresh() {
+    public void Refresh() {
         SmallBlockCount.text = GameController.instance.PlayerState.AvailableSmallBlocks.ToString();
         MediumBlockCount.text = GameController.instance.PlayerState.AvailableMediumBlocks.ToString();
         LargeBlockCount.text = GameController.instance.PlayerState.AvailableLargeBlocks.ToString();
@@ -52,7 +52,7 @@ public class HUDController : MonoBehaviour {
             image.sprite = _upgrades[upgrade];
 
             RectTransform transform = upgradeInstance.GetComponent<RectTransform>();
-            transform.parent = UpgradeBox;
+            transform.SetParent(UpgradeBox, false);
             transform.anchoredPosition = new Vector3(0,bottom,0);
             transform.localScale = Vector3.one;
             bottom += transform.rect.height;

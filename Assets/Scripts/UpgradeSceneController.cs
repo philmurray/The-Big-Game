@@ -6,34 +6,73 @@ using Assets.Scripts.DataStructures;
 
 public class UpgradeSceneController : MonoBehaviour {
 
-    public enum States { Intro, Playing, Stopping };
+    public static UpgradeSceneController instance;
+
+    void Awake()
+    {
+        if (instance == null)
+        {
+            DontDestroyOnLoad(gameObject);
+            instance = this;
+        }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
+
+
     public States SceneState = States.Intro;
-    private float StateStart;
-    private CanvasGroup HUD;
-
     public float PlayTime;
+    public float UpgradeTimeBase;
+    
+    public float UpgradeTimeRandom;
+    public List<UpgradeConfig> Upgrades;
+    public float UpgradeXRange;
+    public float UpgradeY;
+    public GameObject UpgradeObject;
 
-    public List<FallingUpgrade> Upgrades;
+    private float StateStart;
+    private CanvasGroup HUD_Canvas;
+    private HUDController HUD_Controller;
 
-    private List<GameObject> _upgradeGameObjects = new List<GameObject>();
+    public enum States { Intro, Playing, Stopping };
+    private float TotalRarity;
 
     [Serializable]
-    public class FallingUpgrade
+    public class UpgradeConfig
     {
+        public Material Material;
         public PlayerState.Upgrade Upgrade;
-        public Sprite Sprite;
         public float Rarity;
+        public bool IsPremium;
     }
 
     void Start() {
-        HUD = GameObject.FindGameObjectWithTag("HUD").GetComponent<CanvasGroup>();
+        var hud = GameObject.FindGameObjectWithTag("HUD");
+        HUD_Canvas = hud.GetComponent<CanvasGroup>();
+        HUD_Controller = hud.GetComponent<HUDController>();
+
         HideHUD();
+
+        Upgrades.ForEach(u => TotalRarity += u.Rarity);
     }
 
     IEnumerator SpawnUpgrades() {
         while (Time.fixedTime - StateStart < PlayTime) {
-            //make some upgrades fall
-            yield return new WaitForSeconds(1);
+            GameObject o = Instantiate(UpgradeObject, new Vector3(UnityEngine.Random.Range(-UpgradeXRange, UpgradeXRange), UpgradeY, 0), Quaternion.identity) as GameObject;
+            var upgradeTypeNum = UnityEngine.Random.Range(0, TotalRarity);
+            for (int i = 0, l = Upgrades.Count; i<l; i++) {
+                var upgrade = Upgrades[i];
+                if (upgradeTypeNum <= upgrade.Rarity)
+                {
+                    o.GetComponent<FallingUpgrade>().SetUpgrade(upgrade.Upgrade, upgrade.Material, upgrade.IsPremium);
+                    break;
+                }
+                upgradeTypeNum -= upgrade.Rarity;
+            }
+
+            yield return new WaitForSeconds(UpgradeTimeBase + UnityEngine.Random.Range(0, UpgradeTimeRandom));
         }
         SceneState = States.Stopping;
         StateStart = Time.fixedTime;
@@ -45,13 +84,20 @@ public class UpgradeSceneController : MonoBehaviour {
         ShowHUD();
         SceneState = States.Playing;
         StateStart = Time.fixedTime;
+        StartCoroutine(SpawnUpgrades());
+    }
+
+    public void ApplyUpgrade(PlayerState.Upgrade upgrade)
+    {
+        GameController.instance.PlayerState.ApplyUpgrade(upgrade);
+        HUD_Controller.Refresh();
     }
 
     private void HideHUD() {
-        HUD.alpha = 0;
+        HUD_Canvas.alpha = 0;
     }
 
     private void ShowHUD() {
-        HUD.alpha = 1;
+        HUD_Canvas.alpha = 1;
     }
 }
