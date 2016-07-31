@@ -21,6 +21,14 @@ namespace Assets.Scripts.DataStructures
 
         public BlockType Type;
         public Vector3 Position;
+        public int Orientation;
+
+        public List<Vector3> Orientations
+        {
+            get {
+                return GameController.instance.Config.BlocksDictionary[Type].Orientations;
+            }
+        }
 
         public bool IsSupport {
             get {

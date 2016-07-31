@@ -19,7 +19,6 @@ public class BlockContainer : MonoBehaviour {
     
 	void Start () {
         BlockObjects.ForEach(b => _blockObjects.Add(b.BlockType, b.BlockObject));
-        SetBlocks(GameController.instance.Blocks);
 	}
 
     public void SetBlocks(List<Block> blocks)

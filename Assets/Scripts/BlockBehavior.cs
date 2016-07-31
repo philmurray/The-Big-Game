@@ -8,6 +8,7 @@ public class BlockBehavior : MonoBehaviour {
     public Block Block;
     public Material BadMaterial;
     public Material GoodMaterial;
+    public Material SelectedMaterial;
     public bool Draggable;
 
     private bool isDragging;
@@ -40,8 +41,19 @@ public class BlockBehavior : MonoBehaviour {
 
             isDragging = true;
             dragHeight = Block.TransformPosition.y;
+            BuildingSceneController.instance.SelectedBlock = null;
             BuildingSceneController.instance.RemoveBlock(Block);
         }
+    }
+
+    public void Select()
+    {
+        SetMaterial(SelectedMaterial);
+    }
+
+    public void Deselect()
+    {
+        SetMaterial(GoodMaterial);
     }
 
     public void OnMouseUp() {
@@ -50,6 +62,7 @@ public class BlockBehavior : MonoBehaviour {
             if (isGood)
             {
                 BuildingSceneController.instance.PlaceBlock(Block);
+                BuildingSceneController.instance.SelectedBlock = this;
             }
             else
             {
@@ -104,12 +117,17 @@ public class BlockBehavior : MonoBehaviour {
         }
         if (isGood)
         {
-            Renderers.ForEach(r => r.material = GoodMaterial);
+            SetMaterial(SelectedMaterial);
         }
         else
         {
-            Renderers.ForEach(r => r.material = BadMaterial);
+            SetMaterial(BadMaterial);
         }
+    }
+
+    private void SetMaterial(Material material)
+    {
+        Renderers.ForEach(r => r.material = material);
     }
 
     private void UpdatePosition(Vector3 pos)
@@ -138,7 +156,7 @@ public class BlockBehavior : MonoBehaviour {
                         gridPosition.z + Block.Size.z > BuildingSceneController.instance.BaseY)
                     {
                         transform.position = newPosition;
-                        Renderers.ForEach(r => r.material = BadMaterial);
+                        SetMaterial(BadMaterial);
                         isGood = false;
                     }
                     else

@@ -23,10 +23,35 @@ public class BuildingSceneController : MonoBehaviour {
     public int BaseY;
     public int MaxHeight;
 
+    public BlockContainer BlockContainer;
+    public GameObject SelectionMenu;
+
+    private BlockBehavior _selectedBlock;
+    public BlockBehavior SelectedBlock {
+        set
+        {
+            if (_selectedBlock != null)
+            {
+                _selectedBlock.Deselect();
+            }
+            _selectedBlock = value;
+
+            if (_selectedBlock != null)
+            {
+                _selectedBlock.Select();
+            }
+            SelectionMenu.SetActive(_selectedBlock != null);
+        }
+        get {
+            return _selectedBlock;
+        }
+    }
+
     private HUDController HUD_Controller;
 
     void Start()
     {
+        Debug.Log("building scene start");
         var hud = GameObject.FindGameObjectWithTag("HUD");
         HUD_Controller = hud.GetComponent<HUDController>();
 
@@ -40,6 +65,7 @@ public class BuildingSceneController : MonoBehaviour {
                     });
                 }
             }
+            BlockContainer.SetBlocks(GameController.instance.Blocks);
         }
     }
 
@@ -125,6 +151,16 @@ public class BuildingSceneController : MonoBehaviour {
 
             HUD_Controller.Refresh();
         }
+    }
+
+    public void DeleteSelected() {
+        Destroy(_selectedBlock.gameObject);
+        RemoveBlock(_selectedBlock.Block);
+    }
+
+    public void RotateSelected()
+    {
+
     }
 
 }

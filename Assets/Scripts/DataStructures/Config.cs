@@ -16,6 +16,7 @@ namespace Assets.Scripts.DataStructures
         public class BlockConfig {
             public Block.BlockType BlockType;
             public Vector3 Size;
+            public List<Vector3> Orientations;
             public bool IsSupport;
         }
 
