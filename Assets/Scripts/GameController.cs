@@ -8,6 +8,8 @@ public class GameController : MonoBehaviour {
     public PlayerState PlayerState;
     public List<Block> Blocks;
 
+    public Config Config;
+
     public static GameController instance;
 
     void Awake() {
@@ -20,6 +22,10 @@ public class GameController : MonoBehaviour {
         {
             Destroy(gameObject);
         }
+    }
+
+    void Start() {
+        Config.Initialize();
     }
 
 }
