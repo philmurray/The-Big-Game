@@ -22,8 +22,15 @@ namespace Assets.Scripts.DataStructures
         public BlockType Type;
         public Vector3 Position;
 
-        public Vector3 TransformPosition {
+        public bool IsSupport {
             get {
+                return GameController.instance.Config.BlocksDictionary[Type].IsSupport;
+            }
+        }
+
+        public Vector3 TransformPosition {
+            get
+            {
                 return Position + (Size - Vector3.one) / 2;
             }
         }

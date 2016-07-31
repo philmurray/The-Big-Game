@@ -21,6 +21,7 @@ public class BuildingSceneController : MonoBehaviour {
     
     public int BaseX;
     public int BaseY;
+    public int MaxHeight;
 
     private HUDController HUD_Controller;
 

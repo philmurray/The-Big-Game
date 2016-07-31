@@ -14,10 +14,10 @@ public class BlockBehavior : MonoBehaviour {
     private float dragHeight;
     private bool isGood;
 
-    private Renderer Renderer;
+    private List<Renderer> Renderers;
 
     void Start() {
-        Renderer = GetComponent<Renderer>();
+        Renderers = new List<Renderer>(GetComponentsInChildren<Renderer>());
     }
 
     public void OnMouseDown()
@@ -70,19 +70,23 @@ public class BlockBehavior : MonoBehaviour {
                 {
                     if (Block.MinY < b.MaxY && Block.MaxY > b.MinY)
                     {
-                        if (isDragging)
+                        if (b.IsSupport)
                         {
                             UpdatePosition(new Vector3(Block.Position.x, Block.Position.y + b.Size.y, Block.Position.z));
                             return;
                         }
+                        else
+                        {
+                            isGood = false;
+                        }
                     }
-                    else if (Block.MinY == b.MaxY) {
+                    else if (Block.MinY == b.MaxY && b.IsSupport) {
                         supportedBy.Add(b);
                     }
                 }
             }
         }
-        if (isDragging && supportedBy.Count == 0)
+        if (supportedBy.Count == 0)
         {
             if (Block.MinY > 0)
             {
@@ -94,13 +98,17 @@ public class BlockBehavior : MonoBehaviour {
                 isGood = false;
             }
         }
+        if (Block.MaxY > BuildingSceneController.instance.MaxHeight)
+        {
+            isGood = false;
+        }
         if (isGood)
         {
-            Renderer.material = GoodMaterial;
+            Renderers.ForEach(r => r.material = GoodMaterial);
         }
         else
         {
-            Renderer.material = BadMaterial;
+            Renderers.ForEach(r => r.material = BadMaterial);
         }
     }
 
@@ -130,7 +138,7 @@ public class BlockBehavior : MonoBehaviour {
                         gridPosition.z + Block.Size.z > BuildingSceneController.instance.BaseY)
                     {
                         transform.position = newPosition;
-                        Renderer.material = BadMaterial;
+                        Renderers.ForEach(r => r.material = BadMaterial);
                         isGood = false;
                     }
                     else
