@@ -11,9 +11,13 @@ public class BlockButton : MonoBehaviour {
         {
             DraggingBlock = Instantiate(Block) as GameObject;
             var blockBehavior = DraggingBlock.GetComponent<BlockBehavior>();
-            
+
+            if (BuildingSceneController.instance.DefaultOrientation.ContainsKey(blockBehavior.Block.Type)) {
+                blockBehavior.Block.Orientation = BuildingSceneController.instance.DefaultOrientation[blockBehavior.Block.Type];
+            }
             blockBehavior.Block.Position = new Vector3(0, 1, 0);
             blockBehavior.transform.position = blockBehavior.Block.TransformPosition;
+            blockBehavior.transform.rotation = blockBehavior.Block.TransformRotation;
             blockBehavior.OnMouseDown();
         }
     }

@@ -31,7 +31,7 @@ public class BlockContainer : MonoBehaviour {
         Blocks.ForEach(b => AddBlock(b));
     }
     public void AddBlock(Block block) {
-        var go = Instantiate(_blockObjects[block.Type], block.TransformPosition, Quaternion.identity) as GameObject;
+        var go = Instantiate(_blockObjects[block.Type], block.TransformPosition, block.TransformRotation) as GameObject;
         go.GetComponent<BlockBehavior>().Block = block;
     }
 }

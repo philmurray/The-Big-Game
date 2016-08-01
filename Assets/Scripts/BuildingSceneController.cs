@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Assets.Scripts.DataStructures;
+using System.Collections.Generic;
 
 public class BuildingSceneController : MonoBehaviour {
 
@@ -18,13 +19,18 @@ public class BuildingSceneController : MonoBehaviour {
             Destroy(gameObject);
         }
     }
-    
+    public enum States { Intro, Playing, Stopping };
+    public States State = States.Intro;
+
     public int BaseX;
     public int BaseY;
     public int MaxHeight;
 
     public BlockContainer BlockContainer;
     public GameObject SelectionMenu;
+    public GameObject RotateButton;
+
+    public Dictionary<Block.BlockType, int> DefaultOrientation = new Dictionary<Block.BlockType, int>();
 
     private BlockBehavior _selectedBlock;
     public BlockBehavior SelectedBlock {
@@ -41,32 +47,44 @@ public class BuildingSceneController : MonoBehaviour {
                 _selectedBlock.Select();
             }
             SelectionMenu.SetActive(_selectedBlock != null);
+            RotateButton.SetActive(_selectedBlock != null && _selectedBlock.Block.Orientations.Count > 1);
         }
         get {
             return _selectedBlock;
         }
     }
 
+    private GameObject HUD;
     private HUDController HUD_Controller;
+
+    public void Play()
+    {
+        if (State == States.Intro)
+        {
+            State = States.Playing;
+
+            if (GameController.instance.Blocks.Count == 0) {
+                for (int x = 0; x < BaseX; x++) {
+                    for (int y = 0; y < BaseY; y++) {
+                        GameController.instance.Blocks.Add(new Block()
+                        {
+                            Type = Block.BlockType.Base,
+                            Position = new Vector3(x, 0, y)
+                        });
+                    }
+                }
+                BlockContainer.SetBlocks(GameController.instance.Blocks);
+            }
+            Destroy(GameObject.FindGameObjectWithTag("Modal"));
+            HUD.SetActive(true);
+        }
+    }
 
     void Start()
     {
-        Debug.Log("building scene start");
-        var hud = GameObject.FindGameObjectWithTag("HUD");
-        HUD_Controller = hud.GetComponent<HUDController>();
-
-        if (GameController.instance.Blocks.Count == 0) {
-            for (int x = 0; x < BaseX; x++) {
-                for (int y = 0; y < BaseY; y++) {
-                    GameController.instance.Blocks.Add(new Block()
-                    {
-                        Type = Block.BlockType.Base,
-                        Position = new Vector3(x, 0, y)
-                    });
-                }
-            }
-            BlockContainer.SetBlocks(GameController.instance.Blocks);
-        }
+        HUD = GameObject.FindGameObjectWithTag("HUD");
+        HUD_Controller = HUD.GetComponent<HUDController>();
+        HUD.SetActive(false);
     }
 
     public int AvailableBlocks(Block.BlockType block)
@@ -160,7 +178,15 @@ public class BuildingSceneController : MonoBehaviour {
 
     public void RotateSelected()
     {
-
+        _selectedBlock.Rotate();
+        if (!DefaultOrientation.ContainsKey(_selectedBlock.Block.Type))
+        {
+            DefaultOrientation.Add(_selectedBlock.Block.Type, _selectedBlock.Block.Orientation);
+        }
+        else
+        {
+            DefaultOrientation[_selectedBlock.Block.Type] = _selectedBlock.Block.Orientation;
+        }
     }
 
 }

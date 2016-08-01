@@ -42,12 +42,37 @@ namespace Assets.Scripts.DataStructures
                 return Position + (Size - Vector3.one) / 2;
             }
         }
+        public Quaternion TransformRotation {
+            get {
+                return Quaternion.Euler(Orientations[Orientation]);
+            }
+        }
 
         public Vector3 Size
         {
             get
             {
-                return GameController.instance.Config.BlocksDictionary[Type].Size;
+                Vector3 InitialSize = GameController.instance.Config.BlocksDictionary[Type].Size;
+
+                if (Orientations[Orientation].x == 90)
+                {
+                    float tmp = InitialSize.y;
+                    InitialSize.y = InitialSize.z;
+                    InitialSize.z = tmp;
+                }
+                if (Orientations[Orientation].y == 90)
+                {
+                    float tmp = InitialSize.x;
+                    InitialSize.x = InitialSize.z;
+                    InitialSize.z = tmp;
+                }
+                if (Orientations[Orientation].z == 90)
+                {
+                    float tmp = InitialSize.x;
+                    InitialSize.x = InitialSize.y;
+                    InitialSize.y = tmp;
+                }
+                return InitialSize;
             }
         }
         public int MinX

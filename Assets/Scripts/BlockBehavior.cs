@@ -56,6 +56,16 @@ public class BlockBehavior : MonoBehaviour {
         SetMaterial(GoodMaterial);
     }
 
+    public void Rotate()
+    {
+        Block.Orientation = (Block.Orientation + 1) % Block.Orientations.Count;
+        transform.rotation = Block.TransformRotation;
+        UpdatePosition(Block.Position);
+        if (!isGood) {
+            Rotate();
+        }
+    }
+
     public void OnMouseUp() {
         if (isDragging) {
             isDragging = false;
@@ -77,6 +87,10 @@ public class BlockBehavior : MonoBehaviour {
 
         isGood = true;
         foreach (var b in GameController.instance.Blocks) {
+            if (b == Block)
+            {
+                continue;
+            }
             if (Block.MinX < b.MaxX && Block.MaxX > b.MinX)
             {
                 if (Block.MinZ < b.MaxZ && Block.MaxZ > b.MinZ)
