@@ -32,6 +32,16 @@ public class BlockContainer : MonoBehaviour {
     }
     public void AddBlock(Block block) {
         var go = Instantiate(_blockObjects[block.Type], block.TransformPosition, block.TransformRotation) as GameObject;
-        go.GetComponent<BlockBehavior>().Block = block;
+        var bb = go.GetComponent<BlockBehavior>();
+        if (bb != null)
+        {
+            bb.Block = block;
+        }
+        var rbb = go.GetComponent<RealBlockBehavior>();
+        if (rbb != null)
+        {
+            rbb.Block = block;
+        }
+        go.transform.SetParent(transform);
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections;
 using Assets.Scripts.DataStructures;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class BuildingSceneController : MonoBehaviour {
 
@@ -19,7 +20,7 @@ public class BuildingSceneController : MonoBehaviour {
             Destroy(gameObject);
         }
     }
-    public enum States { Intro, Playing, Stopping };
+    public enum States { Intro, Playing, Testing };
     public States State = States.Intro;
 
     public int BaseX;
@@ -27,10 +28,17 @@ public class BuildingSceneController : MonoBehaviour {
     public int MaxHeight;
 
     public BlockContainer BlockContainer;
+    public BlockContainer RealBlockContainer;
+
     public GameObject SelectionMenu;
     public GameObject RotateButton;
+    public GameObject ReadyButton;
+    public GameObject RetryButton;
 
     public Dictionary<Block.BlockType, int> DefaultOrientation = new Dictionary<Block.BlockType, int>();
+
+    public float TestingTime;
+    private float TestingStart;
 
     private BlockBehavior _selectedBlock;
     public BlockBehavior SelectedBlock {
@@ -87,6 +95,76 @@ public class BuildingSceneController : MonoBehaviour {
         HUD.SetActive(false);
     }
 
+    public void ReadyButtonClick()
+    {
+        State = States.Testing;
+        HUD.SetActive(false);
+        BlockContainer.gameObject.SetActive(false);
+        foreach (var child in BlockContainer.gameObject.transform)
+        {
+            var go = child as GameObject;
+            if (go != null)
+            {
+                go.SetActive(false);
+            }
+        }
+
+        RealBlockContainer.SetBlocks(GameController.instance.Blocks);
+        TestingStart = Time.fixedTime;
+
+        StartCoroutine(AwaitPositionChange());
+    }
+
+    public void RetryButtonClick()
+    {
+        foreach (var child in RealBlockContainer.gameObject.transform)
+        {
+            Destroy(((Transform)child).gameObject);
+        }
+
+        State = States.Playing;
+        HUD.SetActive(true);
+        BlockContainer.gameObject.SetActive(true);
+        RetryButton.SetActive(false);
+        foreach (var child in BlockContainer.gameObject.transform)
+        {
+            var go = child as GameObject;
+            if (go != null)
+            {
+                go.SetActive(true);
+            }
+        }
+
+    }
+
+
+    IEnumerator AwaitPositionChange()
+    {
+        var done = false;
+        while (Time.fixedTime < TestingStart + TestingTime && !done) {
+            foreach (var child in RealBlockContainer.gameObject.transform)
+            {
+                var trans = child as Transform;
+                if (trans != null)
+                {
+                    var bp = trans.gameObject.GetComponent<RealBlockBehavior>().Block.TransformPosition;
+                    var dist = Vector3.Distance(trans.position, bp);
+                    if (dist > 0.25f)
+                    {
+                        RetryButton.SetActive(true);
+                        done = true;
+                        break;
+                    }
+                }
+            }
+            yield return new WaitForSeconds(0.5f);
+        }
+        if (done == false)
+        {
+            SceneManager.LoadScene("Shooting");
+        }
+    }
+
     public int AvailableBlocks(Block.BlockType block)
     {
         switch (block)
@@ -130,6 +208,7 @@ public class BuildingSceneController : MonoBehaviour {
                 break;
             case Block.BlockType.Crystal:
                 GameController.instance.PlayerState.AvailableCrystals--;
+                ReadyButton.SetActive(true);
                 break;
             default:
                 break;
@@ -162,6 +241,10 @@ public class BuildingSceneController : MonoBehaviour {
                     break;
                 case Block.BlockType.Crystal:
                     GameController.instance.PlayerState.AvailableCrystals++;
+                    if (!GameController.instance.Blocks.Exists(b => b.Type == Block.BlockType.Crystal))
+                    {
+                        ReadyButton.SetActive(false);
+                    }
                     break;
                 default:
                     break;

@@ -99,7 +99,7 @@ public class BlockBehavior : MonoBehaviour {
                     {
                         if (b.IsSupport)
                         {
-                            UpdatePosition(new Vector3(Block.Position.x, Block.Position.y + b.Size.y, Block.Position.z));
+                            UpdatePosition(new Vector3(Block.Position.x, b.MaxY, Block.Position.z));
                             return;
                         }
                         else

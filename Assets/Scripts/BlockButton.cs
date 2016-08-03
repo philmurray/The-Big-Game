@@ -4,12 +4,14 @@ using System.Collections;
 public class BlockButton : MonoBehaviour {
 
     public GameObject Block;
+    public Transform Parent;
 
     private GameObject DraggingBlock;
     public void StartDrag() {
         if (BuildingSceneController.instance.AvailableBlocks(Block.GetComponent<BlockBehavior>().Block.Type) > 0)
         {
             DraggingBlock = Instantiate(Block) as GameObject;
+            DraggingBlock.transform.SetParent(Parent);
             var blockBehavior = DraggingBlock.GetComponent<BlockBehavior>();
 
             if (BuildingSceneController.instance.DefaultOrientation.ContainsKey(blockBehavior.Block.Type)) {
