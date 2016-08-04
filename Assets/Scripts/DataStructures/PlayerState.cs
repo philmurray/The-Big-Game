@@ -12,7 +12,6 @@ namespace Assets.Scripts.DataStructures
         public int AvailableMediumBlocks;
         public int AvailableLargeBlocks;
         public int AvailableHugeBlocks;
-
         public int AvailableFlags;
         public int AvailableCrystals;
 

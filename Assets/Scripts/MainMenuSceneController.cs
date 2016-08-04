@@ -1,16 +1,16 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class MainMenuSceneController : MonoBehaviour {
 
     // Use this for initialization
     public void OnePlayer() {
-        SceneManager.LoadScene("Upgrades");
+        GameController.instance.NextScene(true);
     }
     public void TwoPlayers()
     {
-        SceneManager.LoadScene("Upgrades");
+        GameController.instance.PlayerTwo.IsHuman = true;
+        GameController.instance.NextScene(true);
     }
     public void Settings()
     {

@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using Assets.Scripts.DataStructures;
-using UnityEngine.SceneManagement;
 
 public class UpgradeSceneController : MonoBehaviour {
 
@@ -32,7 +31,11 @@ public class UpgradeSceneController : MonoBehaviour {
     public List<UpgradeConfig> Upgrades;
     public float UpgradeXRange;
     public float UpgradeY;
-    public GameObject UpgradeObject;
+
+    public float VelocityNormal;
+    public float VelocityPremium;
+    public float StopAtPremium;
+    public float StopForPremium;
 
     private float StateStart;
     private CanvasGroup HUD_Canvas;
@@ -44,8 +47,7 @@ public class UpgradeSceneController : MonoBehaviour {
     [Serializable]
     public class UpgradeConfig
     {
-        public Material Material;
-        public PlayerState.Upgrade Upgrade;
+        public GameObject UpgradeObject;
         public float Rarity;
         public bool IsPremium;
     }
@@ -62,13 +64,20 @@ public class UpgradeSceneController : MonoBehaviour {
 
     IEnumerator SpawnUpgrades() {
         while (Time.fixedTime - StateStart < PlayTime) {
-            GameObject o = Instantiate(UpgradeObject, new Vector3(UnityEngine.Random.Range(-UpgradeXRange, UpgradeXRange), UpgradeY, 0), Quaternion.identity) as GameObject;
             var upgradeTypeNum = UnityEngine.Random.Range(0, TotalRarity);
             for (int i = 0, l = Upgrades.Count; i<l; i++) {
                 var upgrade = Upgrades[i];
                 if (upgradeTypeNum <= upgrade.Rarity)
                 {
-                    o.GetComponent<FallingUpgrade>().SetUpgrade(upgrade.Upgrade, upgrade.Material, upgrade.IsPremium);
+                    GameObject o = Instantiate(upgrade.UpgradeObject, new Vector3(UnityEngine.Random.Range(-UpgradeXRange, UpgradeXRange), UpgradeY, 0), Quaternion.identity) as GameObject;
+                    if (upgrade.IsPremium)
+                    {
+                        o.GetComponent<FallingUpgrade>().SetUpgrade(VelocityPremium, StopAtPremium, StopForPremium);
+                    }
+                    else
+                    {
+                        o.GetComponent<FallingUpgrade>().SetUpgrade(VelocityNormal, -1, -1);
+                    }
                     break;
                 }
                 upgradeTypeNum -= upgrade.Rarity;
@@ -83,7 +92,7 @@ public class UpgradeSceneController : MonoBehaviour {
         SceneState = States.Stopping;
         StateStart = Time.fixedTime;
         yield return new WaitForSeconds(StopTime);
-        SceneManager.LoadScene("Building");
+        GameController.instance.NextScene(true);
     }
 
     public void StartGame()
@@ -97,7 +106,7 @@ public class UpgradeSceneController : MonoBehaviour {
 
     public void ApplyUpgrade(PlayerState.Upgrade upgrade)
     {
-        GameController.instance.PlayerState.ApplyUpgrade(upgrade);
+        GameController.instance.ActivePlayerState.ApplyUpgrade(upgrade);
         HUD_Controller.Refresh();
     }
 

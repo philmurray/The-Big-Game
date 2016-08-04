@@ -2,7 +2,6 @@
 using System.Collections;
 using Assets.Scripts.DataStructures;
 using System.Collections.Generic;
-using UnityEngine.SceneManagement;
 
 public class BuildingSceneController : MonoBehaviour {
 
@@ -71,17 +70,17 @@ public class BuildingSceneController : MonoBehaviour {
         {
             State = States.Playing;
 
-            if (GameController.instance.Blocks.Count == 0) {
+            if (GameController.instance.ActivePlayerBlocks.Count == 0) {
                 for (int x = 0; x < BaseX; x++) {
                     for (int y = 0; y < BaseY; y++) {
-                        GameController.instance.Blocks.Add(new Block()
+                        GameController.instance.ActivePlayerBlocks.Add(new Block()
                         {
                             Type = Block.BlockType.Base,
                             Position = new Vector3(x, 0, y)
                         });
                     }
                 }
-                BlockContainer.SetBlocks(GameController.instance.Blocks);
+                BlockContainer.SetBlocks(GameController.instance.ActivePlayerBlocks);
             }
             Destroy(GameObject.FindGameObjectWithTag("Modal"));
             HUD.SetActive(true);
@@ -109,7 +108,7 @@ public class BuildingSceneController : MonoBehaviour {
             }
         }
 
-        RealBlockContainer.SetBlocks(GameController.instance.Blocks);
+        RealBlockContainer.SetBlocks(GameController.instance.ActivePlayerBlocks);
         TestingStart = Time.fixedTime;
 
         StartCoroutine(AwaitPositionChange());
@@ -161,7 +160,7 @@ public class BuildingSceneController : MonoBehaviour {
         }
         if (done == false)
         {
-            SceneManager.LoadScene("Shooting");
+            GameController.instance.NextScene(true);
         }
     }
 
@@ -170,17 +169,17 @@ public class BuildingSceneController : MonoBehaviour {
         switch (block)
         {
             case Block.BlockType.Small:
-                return GameController.instance.PlayerState.AvailableSmallBlocks;
+                return GameController.instance.ActivePlayerState.AvailableSmallBlocks;
             case Block.BlockType.Medium:
-                return GameController.instance.PlayerState.AvailableMediumBlocks;
+                return GameController.instance.ActivePlayerState.AvailableMediumBlocks;
             case Block.BlockType.Large:
-                return GameController.instance.PlayerState.AvailableLargeBlocks;
+                return GameController.instance.ActivePlayerState.AvailableLargeBlocks;
             case Block.BlockType.Huge:
-                return GameController.instance.PlayerState.AvailableHugeBlocks;
+                return GameController.instance.ActivePlayerState.AvailableHugeBlocks;
             case Block.BlockType.Flag:
-                return GameController.instance.PlayerState.AvailableFlags;
+                return GameController.instance.ActivePlayerState.AvailableFlags;
             case Block.BlockType.Crystal:
-                return GameController.instance.PlayerState.AvailableCrystals;
+                return GameController.instance.ActivePlayerState.AvailableCrystals;
             default:
                 return 0;
         }
@@ -188,26 +187,26 @@ public class BuildingSceneController : MonoBehaviour {
 
     public void PlaceBlock(Block block)
     {
-        GameController.instance.Blocks.Add(block);
+        GameController.instance.ActivePlayerBlocks.Add(block);
         switch (block.Type)
         {
             case Block.BlockType.Small:
-                GameController.instance.PlayerState.AvailableSmallBlocks--;
+                GameController.instance.ActivePlayerState.AvailableSmallBlocks--;
                 break;
             case Block.BlockType.Medium:
-                GameController.instance.PlayerState.AvailableMediumBlocks--;
+                GameController.instance.ActivePlayerState.AvailableMediumBlocks--;
                 break;
             case Block.BlockType.Large:
-                GameController.instance.PlayerState.AvailableLargeBlocks--;
+                GameController.instance.ActivePlayerState.AvailableLargeBlocks--;
                 break;
             case Block.BlockType.Huge:
-                GameController.instance.PlayerState.AvailableHugeBlocks--;
+                GameController.instance.ActivePlayerState.AvailableHugeBlocks--;
                 break;
             case Block.BlockType.Flag:
-                GameController.instance.PlayerState.AvailableFlags--;
+                GameController.instance.ActivePlayerState.AvailableFlags--;
                 break;
             case Block.BlockType.Crystal:
-                GameController.instance.PlayerState.AvailableCrystals--;
+                GameController.instance.ActivePlayerState.AvailableCrystals--;
                 ReadyButton.SetActive(true);
                 break;
             default:
@@ -219,29 +218,29 @@ public class BuildingSceneController : MonoBehaviour {
 
     public void RemoveBlock(Block block)
     {
-        if (GameController.instance.Blocks.Contains(block))
+        if (GameController.instance.ActivePlayerBlocks.Contains(block))
         {
-            GameController.instance.Blocks.Remove(block);
+            GameController.instance.ActivePlayerBlocks.Remove(block);
             switch (block.Type)
             {
                 case Block.BlockType.Small:
-                    GameController.instance.PlayerState.AvailableSmallBlocks++;
+                    GameController.instance.ActivePlayerState.AvailableSmallBlocks++;
                     break;
                 case Block.BlockType.Medium:
-                    GameController.instance.PlayerState.AvailableMediumBlocks++;
+                    GameController.instance.ActivePlayerState.AvailableMediumBlocks++;
                     break;
                 case Block.BlockType.Large:
-                    GameController.instance.PlayerState.AvailableLargeBlocks++;
+                    GameController.instance.ActivePlayerState.AvailableLargeBlocks++;
                     break;
                 case Block.BlockType.Huge:
-                    GameController.instance.PlayerState.AvailableHugeBlocks++;
+                    GameController.instance.ActivePlayerState.AvailableHugeBlocks++;
                     break;
                 case Block.BlockType.Flag:
-                    GameController.instance.PlayerState.AvailableFlags++;
+                    GameController.instance.ActivePlayerState.AvailableFlags++;
                     break;
                 case Block.BlockType.Crystal:
-                    GameController.instance.PlayerState.AvailableCrystals++;
-                    if (!GameController.instance.Blocks.Exists(b => b.Type == Block.BlockType.Crystal))
+                    GameController.instance.ActivePlayerState.AvailableCrystals++;
+                    if (!GameController.instance.ActivePlayerBlocks.Exists(b => b.Type == Block.BlockType.Crystal))
                     {
                         ReadyButton.SetActive(false);
                     }

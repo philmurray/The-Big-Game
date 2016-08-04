@@ -7,47 +7,38 @@ using System.Collections.Generic;
 public class FallingUpgrade : MonoBehaviour {
 
     public PlayerState.Upgrade Upgrade;
-    public Renderer UpgradeRenderer;
 
-    public bool IsPremium;
-
-    public float VelocityNormal;
-    public float VelocityPremium;
-    public float StopAtPremium;
-    public float StopForPremium;
+    private float Velocity;
+    private float StopAt;
+    private float StopFor;
 
     private Rigidbody rb;
     private float StopStart;
 
     public void Start() {
         rb = GetComponent<Rigidbody>();
-        SetVelocity();
+        rb.velocity = new Vector3(0, Velocity, 0);
     }
 
     public void FixedUpdate() {
-        if (IsPremium)
+        if (StopFor > 0)
         {
-            if (transform.localPosition.y < StopAtPremium && StopStart == 0.0f)
+            if (transform.localPosition.y < StopAt && StopStart == 0.0f)
             {
                 StopStart = Time.fixedTime;
                 rb.velocity = Vector3.zero;
             }
-            if (StopStart + StopForPremium < Time.fixedTime)
+            if (StopStart + StopFor < Time.fixedTime)
             {
-                SetVelocity();
+                rb.velocity = new Vector3(0, Velocity, 0);
             }
         }
     }
 
-    public void SetUpgrade(PlayerState.Upgrade upgrade, Material material, bool isPremium) {
-        Upgrade = upgrade;
-        UpgradeRenderer.material = material;
-        IsPremium = isPremium;
-    }
-
-    private void SetVelocity()
-    {
-        rb.velocity = new Vector3(0, IsPremium ? VelocityPremium : VelocityNormal, 0);
+    public void SetUpgrade(float velocity, float stopAt, float stopFor) {
+        Velocity = velocity;
+        StopAt = stopAt;
+        StopFor = stopFor;
     }
 
     void OnTriggerEnter(Collider other)

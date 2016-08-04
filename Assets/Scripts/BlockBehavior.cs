@@ -7,7 +7,7 @@ using System.Collections.Generic;
 public class BlockBehavior : MonoBehaviour {
     public Block Block;
     public Material BadMaterial;
-    public Material GoodMaterial;
+    private Dictionary<Renderer, Material> GoodMaterials = new Dictionary<Renderer, Material>();
     public Material SelectedMaterial;
     public bool Draggable;
 
@@ -25,7 +25,7 @@ public class BlockBehavior : MonoBehaviour {
     {
         if (Draggable)
         {
-            foreach (var b in GameController.instance.Blocks)
+            foreach (var b in GameController.instance.ActivePlayerBlocks)
             {
                 if (Block.MinX < b.MaxX && Block.MaxX > b.MinX)
                 {
@@ -53,7 +53,7 @@ public class BlockBehavior : MonoBehaviour {
 
     public void Deselect()
     {
-        SetMaterial(GoodMaterial);
+        Renderers.ForEach(r => r.material = GoodMaterials[r]);
     }
 
     public void Rotate()
@@ -86,7 +86,7 @@ public class BlockBehavior : MonoBehaviour {
         List<Block> supportedBy = new List<Block>();
 
         isGood = true;
-        foreach (var b in GameController.instance.Blocks) {
+        foreach (var b in GameController.instance.ActivePlayerBlocks) {
             if (b == Block)
             {
                 continue;
@@ -141,6 +141,10 @@ public class BlockBehavior : MonoBehaviour {
 
     private void SetMaterial(Material material)
     {
+        if (GoodMaterials.Count == 0)
+        {
+            Renderers.ForEach(r => GoodMaterials.Add(r, r.material));
+        }
         Renderers.ForEach(r => r.material = material);
     }
 
