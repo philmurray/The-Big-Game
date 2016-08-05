@@ -10,7 +10,18 @@ namespace Assets.Scripts.DataStructures
     public class Config
     {
         public List<BlockConfig> Blocks;
-        public Dictionary<Block.BlockType, BlockConfig> BlocksDictionary = new Dictionary<Block.BlockType, BlockConfig>();
+
+        private Dictionary<Block.BlockType, BlockConfig> _blocksDictionary;
+        public Dictionary<Block.BlockType, BlockConfig> BlocksDictionary {
+            get
+            {
+                if (_blocksDictionary == null) {
+                    _blocksDictionary = new Dictionary<Block.BlockType, BlockConfig>();
+                    Blocks.ForEach(b => _blocksDictionary.Add(b.BlockType, b));
+                }
+                return _blocksDictionary;
+            }
+        }
 
         [Serializable]
         public class BlockConfig {
@@ -18,11 +29,6 @@ namespace Assets.Scripts.DataStructures
             public Vector3 Size;
             public List<Vector3> Orientations;
             public bool IsSupport;
-        }
-
-        public void Initialize()
-        {
-            Blocks.ForEach(b => BlocksDictionary.Add(b.BlockType, b));
         }
     }
 }

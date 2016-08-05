@@ -17,7 +17,17 @@ public class HUDController : MonoBehaviour {
 
     public RectTransform UpgradeBox;
     public List<HUDUpgrade> Upgrades;
-    private Dictionary<PlayerState.Upgrade, Sprite> _upgrades;
+    private Dictionary<PlayerState.Upgrade, Sprite> _upgradesDictionary;
+    private Dictionary<PlayerState.Upgrade, Sprite> UpgradesDictionary {
+        get
+        {
+            if (_upgradesDictionary == null) {
+                _upgradesDictionary = new Dictionary<PlayerState.Upgrade, Sprite>();
+                Upgrades.ForEach(u => _upgradesDictionary.Add(u.Upgrade, u.Sprite));
+            }
+            return _upgradesDictionary;
+        }
+    }
 
     private List<GameObject> _upgradeGameObjects = new List<GameObject>();
 
@@ -29,9 +39,6 @@ public class HUDController : MonoBehaviour {
 
     // Update is called once per frame
     void Start () {
-        _upgrades = new Dictionary<PlayerState.Upgrade, Sprite>();
-        Upgrades.ForEach(u => _upgrades.Add(u.Upgrade, u.Sprite));
-
         Refresh();
 	}
 
@@ -49,7 +56,7 @@ public class HUDController : MonoBehaviour {
         {
             GameObject upgradeInstance = Instantiate(UpgradeGameObject);
             Image image = upgradeInstance.GetComponent<Image>();
-            image.sprite = _upgrades[upgrade];
+            image.sprite = UpgradesDictionary[upgrade];
 
             RectTransform transform = upgradeInstance.GetComponent<RectTransform>();
             transform.SetParent(UpgradeBox, false);

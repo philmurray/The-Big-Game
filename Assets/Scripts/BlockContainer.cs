@@ -9,17 +9,25 @@ public class BlockContainer : MonoBehaviour {
     public List<Block> Blocks;
     public List<BlockTypeItem> BlockObjects;
 
-    private Dictionary<Block.BlockType, GameObject> _blockObjects = new Dictionary<Block.BlockType, GameObject>();
+    private Dictionary<Block.BlockType, GameObject> _blockObjects;
+    public Dictionary<Block.BlockType, GameObject> BlockObjectsDictionary
+    {
+        get
+        {
+            if (_blockObjects == null)
+            {
+                _blockObjects = new Dictionary<Block.BlockType, GameObject>();
+                BlockObjects.ForEach(b => _blockObjects.Add(b.BlockType, b.BlockObject));
+            }
+            return _blockObjects;
+        }
+    }
 
     [Serializable]
     public class BlockTypeItem {
         public Block.BlockType BlockType;
         public GameObject BlockObject;
     }
-    
-	void Start () {
-        BlockObjects.ForEach(b => _blockObjects.Add(b.BlockType, b.BlockObject));
-	}
 
     public void SetBlocks(List<Block> blocks)
     {
@@ -30,8 +38,9 @@ public class BlockContainer : MonoBehaviour {
         Blocks = blocks;
         Blocks.ForEach(b => AddBlock(b));
     }
-    public void AddBlock(Block block) {
-        var go = Instantiate(_blockObjects[block.Type], block.TransformPosition, block.TransformRotation) as GameObject;
+    public void AddBlock(Block block)
+    {
+        var go = Instantiate(BlockObjectsDictionary[block.Type], block.TransformPosition, block.TransformRotation) as GameObject;
         var bb = go.GetComponent<BlockBehavior>();
         if (bb != null)
         {
@@ -42,6 +51,6 @@ public class BlockContainer : MonoBehaviour {
         {
             rbb.Block = block;
         }
-        go.transform.SetParent(transform);
+        go.transform.SetParent(transform,false);
     }
 }

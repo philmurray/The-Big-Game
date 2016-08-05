@@ -62,9 +62,15 @@ public class GameController : MonoBehaviour
         }
     }
 
-    void Start()
-    {
-        Config.Initialize();
+    public GamePlayer GetPlayer(Player p) {
+        if (p == Player.One)
+        {
+            return PlayerOne;
+        }
+        else
+        {
+            return PlayerTwo;
+        }
     }
 
     public void NextScene() {
