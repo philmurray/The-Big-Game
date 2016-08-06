@@ -9,15 +9,7 @@ public class BuildingSceneController : MonoBehaviour {
 
     void Awake()
     {
-        if (instance == null)
-        {
-            DontDestroyOnLoad(gameObject);
-            instance = this;
-        }
-        else if (instance != this)
-        {
-            Destroy(gameObject);
-        }
+        instance = this;
     }
     public enum States { Intro, Playing, Testing };
     public States State = States.Intro;
@@ -61,9 +53,6 @@ public class BuildingSceneController : MonoBehaviour {
         }
     }
 
-    private GameObject HUD;
-    private HUDController HUD_Controller;
-
     public void Play()
     {
         if (State == States.Intro)
@@ -83,21 +72,19 @@ public class BuildingSceneController : MonoBehaviour {
                 BlockContainer.SetBlocks(GameController.instance.ActivePlayerBlocks);
             }
             Destroy(GameObject.FindGameObjectWithTag("Modal"));
-            HUD.SetActive(true);
+            HUDController.instance.gameObject.SetActive(true);
         }
     }
 
     void Start()
     {
-        HUD = GameObject.FindGameObjectWithTag("HUD");
-        HUD_Controller = HUD.GetComponent<HUDController>();
-        HUD.SetActive(false);
+        HUDController.instance.gameObject.SetActive(false);
     }
 
     public void ReadyButtonClick()
     {
         State = States.Testing;
-        HUD.SetActive(false);
+        HUDController.instance.gameObject.SetActive(false);
         BlockContainer.gameObject.SetActive(false);
         foreach (var child in BlockContainer.gameObject.transform)
         {
@@ -122,7 +109,7 @@ public class BuildingSceneController : MonoBehaviour {
         }
 
         State = States.Playing;
-        HUD.SetActive(true);
+        HUDController.instance.gameObject.SetActive(true);
         BlockContainer.gameObject.SetActive(true);
         RetryButton.SetActive(false);
         foreach (var child in BlockContainer.gameObject.transform)
@@ -213,7 +200,7 @@ public class BuildingSceneController : MonoBehaviour {
                 break;
         }
 
-        HUD_Controller.Refresh();
+        HUDController.instance.Refresh();
     }
 
     public void RemoveBlock(Block block)
@@ -249,7 +236,7 @@ public class BuildingSceneController : MonoBehaviour {
                     break;
             }
 
-            HUD_Controller.Refresh();
+            HUDController.instance.Refresh();
         }
     }
 

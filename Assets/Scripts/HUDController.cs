@@ -6,7 +6,14 @@ using System.Collections.Generic;
 using System;
 
 public class HUDController : MonoBehaviour {
-    
+
+    public static HUDController instance;
+
+    void Awake()
+    {
+        instance = this;
+    }
+
     public Text SmallBlockCount;
     public Text MediumBlockCount;
     public Text LargeBlockCount;

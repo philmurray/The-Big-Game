@@ -10,15 +10,7 @@ public class UpgradeSceneController : MonoBehaviour {
 
     void Awake()
     {
-        if (instance == null)
-        {
-            DontDestroyOnLoad(gameObject);
-            instance = this;
-        }
-        else if (instance != this)
-        {
-            Destroy(gameObject);
-        }
+        instance = this;
     }
 
 
@@ -38,8 +30,6 @@ public class UpgradeSceneController : MonoBehaviour {
     public float StopForPremium;
 
     private float StateStart;
-    private CanvasGroup HUD_Canvas;
-    private HUDController HUD_Controller;
 
     public enum States { Intro, Playing, Stopping };
     private float TotalRarity;
@@ -53,11 +43,7 @@ public class UpgradeSceneController : MonoBehaviour {
     }
 
     void Start() {
-        var hud = GameObject.FindGameObjectWithTag("HUD");
-        HUD_Canvas = hud.GetComponent<CanvasGroup>();
-        HUD_Controller = hud.GetComponent<HUDController>();
-
-        HideHUD();
+        HUDController.instance.gameObject.SetActive(false);
 
         Upgrades.ForEach(u => TotalRarity += u.Rarity);
     }
@@ -98,7 +84,7 @@ public class UpgradeSceneController : MonoBehaviour {
     public void StartGame()
     {
         Destroy(GameObject.FindGameObjectWithTag("Modal"));
-        ShowHUD();
+        HUDController.instance.gameObject.SetActive(true);
         SceneState = States.Playing;
         StateStart = Time.fixedTime;
         StartCoroutine(SpawnUpgrades());
@@ -107,14 +93,6 @@ public class UpgradeSceneController : MonoBehaviour {
     public void ApplyUpgrade(PlayerState.Upgrade upgrade)
     {
         GameController.instance.ActivePlayerState.ApplyUpgrade(upgrade);
-        HUD_Controller.Refresh();
-    }
-
-    private void HideHUD() {
-        HUD_Canvas.alpha = 0;
-    }
-
-    private void ShowHUD() {
-        HUD_Canvas.alpha = 1;
+        HUDController.instance.Refresh();
     }
 }

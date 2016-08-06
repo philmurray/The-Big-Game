@@ -84,11 +84,9 @@ public class GameController : MonoBehaviour
                 SceneManager.LoadScene("Upgrades");
                 break;
             case "Upgrades":
-                UpgradeSceneController.instance = null;
                 SceneManager.LoadScene("Building");
                 break;
             case "Building":
-                BuildingSceneController.instance = null;
                 if (ActivePlayer == Player.One && PlayerTwo.IsHuman)
                 {
                     ActivePlayer = Player.Two;
