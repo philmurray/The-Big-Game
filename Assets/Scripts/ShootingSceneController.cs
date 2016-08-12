@@ -12,13 +12,14 @@ public class ShootingSceneController : MonoBehaviour {
     {
         instance = this;
     }
-    public enum States { Intro, PlayerShoot, ResolveShots, Summary };
+    public enum States { Intro, PlayerShoot, Firing, Summary };
     public States State = States.Intro;
 
     [Serializable]
     public class PlayerObjects {
         public GameController.Player Player;
         public BlockContainer BlockContainer;
+        public Transform WeaponContainer;
         public Camera ShootCamera;
         public Camera FireCamera;
         public Camera HitCamera;
@@ -33,6 +34,13 @@ public class ShootingSceneController : MonoBehaviour {
                 PlayersList.ForEach(p => _playersDictionary.Add(p.Player, p));
             }
             return _playersDictionary;
+        }
+    }
+    public PlayerObjects ActivePlayer
+    {
+        get
+        {
+            return PlayersDictionary[GameController.instance.ActivePlayer];
         }
     }
 
@@ -81,24 +89,33 @@ public class ShootingSceneController : MonoBehaviour {
 
         foreach (var p in PlayersList)
         {
-            GameController.instance.ActivePlayer = p.Player;
             p.BlockContainer.SetBlocks(GameController.instance.GetPlayer(p.Player).Blocks);
+        }
+
+        if (State == States.PlayerShoot) {
+            State = States.Intro;
+            IntroDone();
         }
     }
 
     public void IntroDone() {
-        if (State == States.Intro) {
-            State = States.PlayerShoot;
+        if (State == States.Intro)
+        {
             IntroCamera.enabled = false;
-            StartPlayerTurn(GameController.Player.One);
-            SelectCatapult();
-            HUDController.instance.gameObject.SetActive(true);
+            StartPlayerShoot();
         }
+    }
+
+    public void StartPlayerShoot() {
+        State = States.PlayerShoot;
+        StartPlayerTurn(GameController.Player.One);
+        HUDController.instance.gameObject.SetActive(true);
     }
 
     private void StartPlayerTurn(GameController.Player player) {
         GameController.instance.ActivePlayer = player;
-        PlayersDictionary[player].ShootCamera.enabled = true;
+        ActivePlayer.ShootCamera.enabled = true;
+        SelectCatapult();
     }
 
     public void SelectCatapult() {
@@ -113,5 +130,30 @@ public class ShootingSceneController : MonoBehaviour {
         ActiveWeaponType = weapon;
         WeaponsList.ForEach(w => w.SelectionButton.Select(false));
         ActiveWeapon.SelectionButton.Select(true);
+        var weaponObject = Instantiate(ActiveWeapon.WeaponPrefab) as GameObject;
+        weaponObject.transform.SetParent(ActivePlayer.WeaponContainer,false);
+    }
+
+    public void PlayerReady()
+    {
+        ActivePlayer.ShootCamera.enabled = false;
+        if (GameController.instance.ActivePlayer == GameController.Player.One)
+        {
+            if (GameController.instance.PlayerTwo.IsHuman)
+            {
+                StartPlayerTurn(GameController.Player.Two);
+            }
+            else
+            {
+                //TODO: AI?
+            }
+        }
+        else {
+            StartFiring();
+        }
+    }
+
+    public void StartFiring() {
+
     }
 }

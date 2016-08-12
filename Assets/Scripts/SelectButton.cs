@@ -11,7 +11,7 @@ public class SelectButton : MonoBehaviour {
     private Color _normalColor;
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
         _image = GetComponent<Image>();
         _normalColor = _image.color;
 	}
