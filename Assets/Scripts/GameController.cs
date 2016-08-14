@@ -44,6 +44,11 @@ public class GameController : MonoBehaviour
     }
 
     public Player ActivePlayer;
+    public Player OtherPlayer {
+        get {
+            return ActivePlayer == Player.One ? Player.Two : Player.One;
+        }
+    }
 
     public Config Config;
 

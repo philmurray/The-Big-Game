@@ -7,40 +7,38 @@ using UnityEngine.UI;
 public class ShootingSceneController : MonoBehaviour {
 
     public static ShootingSceneController instance;
-
     void Awake()
     {
         instance = this;
     }
     public enum States { Intro, PlayerShoot, Firing, Summary };
+
     public States State = States.Intro;
+    
+    public List<ShootingPlayerController> PlayersList;
 
-    [Serializable]
-    public class PlayerObjects {
-        public GameController.Player Player;
-        public BlockContainer BlockContainer;
-        public Transform WeaponContainer;
-        public Camera ShootCamera;
-        public Camera FireCamera;
-        public Camera HitCamera;
-    }
-    public List<PlayerObjects> PlayersList;
-
-    private Dictionary<GameController.Player, PlayerObjects> _playersDictionary;
-    public Dictionary<GameController.Player, PlayerObjects> PlayersDictionary {
+    private Dictionary<GameController.Player, ShootingPlayerController> _playersDictionary;
+    public Dictionary<GameController.Player, ShootingPlayerController> PlayersDictionary {
         get {
             if (_playersDictionary == null) {
-                _playersDictionary = new Dictionary<GameController.Player, PlayerObjects>();
+                _playersDictionary = new Dictionary<GameController.Player, ShootingPlayerController>();
                 PlayersList.ForEach(p => _playersDictionary.Add(p.Player, p));
             }
             return _playersDictionary;
         }
     }
-    public PlayerObjects ActivePlayer
+    public ShootingPlayerController ActivePlayer
     {
         get
         {
             return PlayersDictionary[GameController.instance.ActivePlayer];
+        }
+    }
+    public ShootingPlayerController OtherPlayer
+    {
+        get
+        {
+            return PlayersDictionary[GameController.instance.OtherPlayer];
         }
     }
 
@@ -53,7 +51,7 @@ public class ShootingSceneController : MonoBehaviour {
     public class WeaponObjects
     {
         public Weapons Weapon;
-        public GameObject WeaponPrefab;
+        public WeaponBehavior WeaponPrefab;
         public GameObject WeaponMenu;
         public SelectButton SelectionButton;
     }
@@ -87,17 +85,21 @@ public class ShootingSceneController : MonoBehaviour {
     {
         HUDController.instance.gameObject.SetActive(false);
 
-        foreach (var p in PlayersList)
+        if (State == States.Intro)
         {
-            p.BlockContainer.SetBlocks(GameController.instance.GetPlayer(p.Player).Blocks);
+            IntroStart();
         }
-
-        if (State == States.PlayerShoot) {
+        else if (State == States.PlayerShoot)
+        {
             State = States.Intro;
             IntroDone();
         }
     }
 
+    public void IntroStart()
+    {
+        IntroCamera.enabled = true;
+    }
     public void IntroDone() {
         if (State == States.Intro)
         {
@@ -114,7 +116,7 @@ public class ShootingSceneController : MonoBehaviour {
 
     private void StartPlayerTurn(GameController.Player player) {
         GameController.instance.ActivePlayer = player;
-        ActivePlayer.ShootCamera.enabled = true;
+        ActivePlayer.StartAiming();
         SelectCatapult();
     }
 
@@ -130,13 +132,12 @@ public class ShootingSceneController : MonoBehaviour {
         ActiveWeaponType = weapon;
         WeaponsList.ForEach(w => w.SelectionButton.Select(false));
         ActiveWeapon.SelectionButton.Select(true);
-        var weaponObject = Instantiate(ActiveWeapon.WeaponPrefab) as GameObject;
-        weaponObject.transform.SetParent(ActivePlayer.WeaponContainer,false);
+        ActivePlayer.SelectWeapon(ActiveWeapon.WeaponPrefab);
     }
 
     public void PlayerReady()
     {
-        ActivePlayer.ShootCamera.enabled = false;
+        ActivePlayer.EndAiming();
         if (GameController.instance.ActivePlayer == GameController.Player.One)
         {
             if (GameController.instance.PlayerTwo.IsHuman)
@@ -153,7 +154,21 @@ public class ShootingSceneController : MonoBehaviour {
         }
     }
 
-    public void StartFiring() {
+    public void StartFiring()
+    {
+        State = States.Firing;
+        HUDController.instance.gameObject.SetActive(false);
+        GameController.instance.ActivePlayer = GameController.Player.One;
+        ActivePlayer.StartShooting();
+    }
 
+    public void StartProjectileFollow(GameObject projectile) {
+        ProjectileFollowCamera.enabled = true;
+        ProjectileFollowCamera.gameObject.GetComponent<FollowProjectileBehavior>().Target = projectile;
+        OtherPlayer.WaitForProjectile(projectile);
+    }
+    public void StopProjectileFollow() {
+        ProjectileFollowCamera.enabled = false;
+        ProjectileFollowCamera.gameObject.GetComponent<FollowProjectileBehavior>().Target = null;
     }
 }
