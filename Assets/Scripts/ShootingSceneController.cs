@@ -11,7 +11,7 @@ public class ShootingSceneController : MonoBehaviour {
     {
         instance = this;
     }
-    public enum States { Intro, PlayerShoot, Firing, Summary };
+    public enum States { Intro, Aiming, Firing, Summary };
 
     public States State = States.Intro;
     
@@ -89,7 +89,7 @@ public class ShootingSceneController : MonoBehaviour {
         {
             IntroStart();
         }
-        else if (State == States.PlayerShoot)
+        else if (State == States.Aiming)
         {
             State = States.Intro;
             IntroDone();
@@ -104,17 +104,17 @@ public class ShootingSceneController : MonoBehaviour {
         if (State == States.Intro)
         {
             IntroCamera.enabled = false;
-            StartPlayerShoot();
+            StartAim();
         }
     }
 
-    public void StartPlayerShoot() {
-        State = States.PlayerShoot;
-        StartPlayerTurn(GameController.Player.One);
+    public void StartAim() {
+        State = States.Aiming;
+        StartPlayerAim(GameController.Player.One);
         HUDController.instance.gameObject.SetActive(true);
     }
 
-    private void StartPlayerTurn(GameController.Player player) {
+    private void StartPlayerAim(GameController.Player player) {
         GameController.instance.ActivePlayer = player;
         ActivePlayer.StartAiming();
         SelectCatapult();
@@ -142,7 +142,7 @@ public class ShootingSceneController : MonoBehaviour {
         {
             if (GameController.instance.PlayerTwo.IsHuman)
             {
-                StartPlayerTurn(GameController.Player.Two);
+                StartPlayerAim(GameController.Player.Two);
             }
             else
             {
@@ -158,7 +158,12 @@ public class ShootingSceneController : MonoBehaviour {
     {
         State = States.Firing;
         HUDController.instance.gameObject.SetActive(false);
-        GameController.instance.ActivePlayer = GameController.Player.One;
+        StartPlayerFiring(GameController.Player.One);
+    }
+
+    private void StartPlayerFiring(GameController.Player player)
+    {
+        GameController.instance.ActivePlayer = player;
         ActivePlayer.StartShooting();
     }
 
@@ -170,5 +175,17 @@ public class ShootingSceneController : MonoBehaviour {
     public void StopProjectileFollow() {
         ProjectileFollowCamera.enabled = false;
         ProjectileFollowCamera.gameObject.GetComponent<FollowProjectileBehavior>().Target = null;
+    }
+
+    public void StopPlayerFiring()
+    {
+        if (GameController.instance.ActivePlayer == GameController.Player.One)
+        {
+            StartPlayerFiring(GameController.Player.Two);
+        }
+        else
+        {
+            StartAim();
+        }
     }
 }

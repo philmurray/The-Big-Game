@@ -20,7 +20,6 @@ public class ShootingPlayerController : MonoBehaviour {
 
     private WeaponBehavior _weapon;
     private GameObject _incomingProjectile;
-    private Vector3 _hitPoint;
 
     void Start() {
         BlockContainer.SetBlocks(GameController.instance.GetPlayer(Player).Blocks);
@@ -33,11 +32,23 @@ public class ShootingPlayerController : MonoBehaviour {
                 var distance = Vector3.Distance(HitTarget.position, _incomingProjectile.transform.position);
                 if (distance < HitTargetDistance)
                 {
-                    ShootingSceneController.instance.StopProjectileFollow();
-                    HitCamera.enabled = true;
+                    StartHitting();
                 }
             }
-            //Wait for stabilization
+            var hasChanged = _incomingProjectile.GetComponent<PositionTracker>().HasChanged;
+            if (!hasChanged) {
+
+                foreach (var pt in BlockContainer.GetComponentsInChildren<PositionTracker>()) {
+                    if (pt.HasChanged) {
+                        hasChanged = true;
+                        break;
+                    }
+                }
+            }
+            if (!hasChanged)
+            {
+                StopHitting();
+            }
         }
     }
 
@@ -67,11 +78,14 @@ public class ShootingPlayerController : MonoBehaviour {
         _weapon.Fire();
         yield return new WaitForSeconds(FireCameraWait);
         ShootingSceneController.instance.StartProjectileFollow(_weapon.Projectile);
+        EndShooting();
     }
 
     public void EndShooting()
     {
         FireCamera.enabled = false;
+        ToggleBlocks(true);
+        ToggleWeapon(false, false);
     }
 
     public void SelectWeapon(WeaponBehavior weapon)
@@ -81,13 +95,17 @@ public class ShootingPlayerController : MonoBehaviour {
         _weapon = weaponObject.GetComponent<WeaponBehavior>();
         _weapon.GetReady();
     }
-
     private void ToggleWeapon(bool visible)
+    {
+        ToggleWeapon(visible, true);
+    }
+
+    private void ToggleWeapon(bool visible, bool withProjectile)
     {
         if (_weapon != null)
         {
             ToggleActive(_weapon.gameObject, visible);
-            if (_weapon.Projectile != null)
+            if (withProjectile && _weapon.Projectile != null)
             {
                 ToggleActive(_weapon.Projectile, visible);
             }
@@ -114,5 +132,19 @@ public class ShootingPlayerController : MonoBehaviour {
     public void WaitForProjectile(GameObject projectile)
     {
         _incomingProjectile = projectile;
+    }
+
+    private void StartHitting()
+    {
+        ShootingSceneController.instance.StopProjectileFollow();
+        HitCamera.enabled = true;
+    }
+
+    private void StopHitting()
+    {
+        ShootingSceneController.instance.StopPlayerFiring();
+        _incomingProjectile.transform.SetParent(BlockContainer.transform);
+        _incomingProjectile = null;
+        HitCamera.enabled = false;
     }
 }
