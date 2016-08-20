@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine.UI;
+using Assets.Scripts.DataStructures;
 
 public class ShootingSceneController : MonoBehaviour {
 
@@ -42,39 +43,32 @@ public class ShootingSceneController : MonoBehaviour {
         }
     }
 
-    public enum Weapons {
-        Crossbow,
-        Catapult
-    };
-
     [Serializable]
     public class WeaponObjects
     {
-        public Weapons Weapon;
-        public WeaponBehavior WeaponPrefab;
+        public Weapon.WeaponType Weapon;
         public GameObject WeaponMenu;
         public SelectButton SelectionButton;
     }
     public List<WeaponObjects> WeaponsList;
 
-    private Dictionary<Weapons, WeaponObjects> _weaponsDictionary;
-    public Dictionary<Weapons, WeaponObjects> WeaponsDictionary
+    private Dictionary<Weapon.WeaponType, WeaponObjects> _weaponsDictionary;
+    public Dictionary<Weapon.WeaponType, WeaponObjects> WeaponsDictionary
     {
         get
         {
             if (_weaponsDictionary == null)
             {
-                _weaponsDictionary = new Dictionary<Weapons, WeaponObjects>();
+                _weaponsDictionary = new Dictionary<Weapon.WeaponType, WeaponObjects>();
                 WeaponsList.ForEach(p => _weaponsDictionary.Add(p.Weapon, p));
             }
             return _weaponsDictionary;
         }
     }
 
-    public Weapons ActiveWeaponType;
     public WeaponObjects ActiveWeapon {
         get {
-            return WeaponsDictionary[ActiveWeaponType];
+            return WeaponsDictionary[GameController.instance.ActivePlayerWeapon.Type];
         }
     }
 
@@ -84,6 +78,8 @@ public class ShootingSceneController : MonoBehaviour {
     void Start()
     {
         HUDController.instance.gameObject.SetActive(false);
+
+        PlayersList.ForEach(p => p.StartTargeted());
 
         if (State == States.Intro)
         {
@@ -117,22 +113,24 @@ public class ShootingSceneController : MonoBehaviour {
     private void StartPlayerAim(GameController.Player player) {
         GameController.instance.ActivePlayer = player;
         ActivePlayer.StartAiming();
-        SelectCatapult();
+        SelectWeaponMenu(GameController.instance.ActivePlayerWeapon.Type);
     }
 
     public void SelectCatapult() {
-        SelectWeapon(Weapons.Catapult);
+        SelectWeapon(Weapon.WeaponType.Catapult);
     }
 
     public void SelectCrossbow() {
-        SelectWeapon(Weapons.Crossbow);
+        SelectWeapon(Weapon.WeaponType.Crossbow);
+    }
+    public void SelectWeapon(Weapon.WeaponType weapon) {
+        ActivePlayer.SelectWeapon(weapon);
+        SelectWeaponMenu(weapon);
     }
 
-    public void SelectWeapon(Weapons weapon) {
-        ActiveWeaponType = weapon;
+    public void SelectWeaponMenu(Weapon.WeaponType weapon) {
         WeaponsList.ForEach(w => w.SelectionButton.Select(false));
         ActiveWeapon.SelectionButton.Select(true);
-        ActivePlayer.SelectWeapon(ActiveWeapon.WeaponPrefab);
     }
 
     public void PlayerReady()

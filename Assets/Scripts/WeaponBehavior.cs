@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.DataStructures;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,9 +9,24 @@ public abstract class WeaponBehavior : MonoBehaviour
 {
     public GameObject ProjectilePrefab;
     public Transform ProjectileSpawnPoint;
-    public GameObject Projectile;
-    public abstract void Fire();
-    public void GetReady() {
-        Projectile = Instantiate(ProjectilePrefab, ProjectileSpawnPoint.position, Quaternion.identity) as GameObject;
+    public Weapon WeaponState;
+
+    private GameObject Projectile;
+
+    public virtual GameObject Fire() {
+        var p = Projectile;
+        Projectile.transform.SetParent(null, true);
+        Projectile = null;
+        return p;
+    }
+    public virtual void GetReady() {
+        if (Projectile == null)
+        {
+            Projectile = Instantiate(ProjectilePrefab, ProjectileSpawnPoint.position, Quaternion.identity) as GameObject;
+            Projectile.transform.SetParent(transform, true);
+        }
+    }
+    public virtual void SetState(Weapon weaponState) {
+        WeaponState = weaponState;
     }
 }

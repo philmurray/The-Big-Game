@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using Assets.Scripts.DataStructures;
 
 public class ShootingPlayerController : MonoBehaviour {
 
     public GameController.Player Player;
     public BlockContainer BlockContainer;
-    public Transform WeaponContainer;
+    public WeaponContainer WeaponContainer;
 
     public Camera AimCamera;
 
@@ -17,8 +18,7 @@ public class ShootingPlayerController : MonoBehaviour {
     public Camera HitCamera;
     public Transform HitTarget;
     public float HitTargetDistance;
-
-    private WeaponBehavior _weapon;
+    
     private GameObject _incomingProjectile;
 
     void Start() {
@@ -51,12 +51,18 @@ public class ShootingPlayerController : MonoBehaviour {
             }
         }
     }
+    public void StartTargeted()
+    {
+        ToggleBlocks(true);
+        ToggleWeapon(false);
+    }
 
     public void StartAiming()
     {
         AimCamera.enabled = true;
         ToggleBlocks(false);
         ToggleWeapon(true);
+        WeaponContainer.SelectWeapon(GameController.instance.GetPlayer(Player).Weapon);
     }
     public void EndAiming() {
         AimCamera.enabled = false;
@@ -75,9 +81,9 @@ public class ShootingPlayerController : MonoBehaviour {
     private IEnumerator WaitToFire()
     {
         yield return new WaitForSeconds(FireWait);
-        _weapon.Fire();
+        GameObject projectile = WeaponContainer.Weapon.Fire();
         yield return new WaitForSeconds(FireCameraWait);
-        ShootingSceneController.instance.StartProjectileFollow(_weapon.Projectile);
+        ShootingSceneController.instance.StartProjectileFollow(projectile);
         EndShooting();
     }
 
@@ -85,31 +91,18 @@ public class ShootingPlayerController : MonoBehaviour {
     {
         FireCamera.enabled = false;
         ToggleBlocks(true);
-        ToggleWeapon(false, false);
+        WeaponContainer.RemoveWeapon();
     }
 
-    public void SelectWeapon(WeaponBehavior weapon)
+    public void SelectWeapon(Weapon.WeaponType weapon)
     {
-        var weaponObject = Instantiate(weapon.gameObject) as GameObject;
-        weaponObject.transform.SetParent(WeaponContainer, false);
-        _weapon = weaponObject.GetComponent<WeaponBehavior>();
-        _weapon.GetReady();
+        GameController.instance.GetPlayer(Player).Weapon.Type = weapon;
+        WeaponContainer.SelectWeapon(GameController.instance.GetPlayer(Player).Weapon);
     }
+
     private void ToggleWeapon(bool visible)
     {
-        ToggleWeapon(visible, true);
-    }
-
-    private void ToggleWeapon(bool visible, bool withProjectile)
-    {
-        if (_weapon != null)
-        {
-            ToggleActive(_weapon.gameObject, visible);
-            if (withProjectile && _weapon.Projectile != null)
-            {
-                ToggleActive(_weapon.Projectile, visible);
-            }
-        }
+        ToggleActive(WeaponContainer.gameObject, visible);
     }
 
     private void ToggleBlocks(bool visible)

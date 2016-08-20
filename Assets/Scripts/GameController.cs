@@ -14,6 +14,10 @@ public class GameController : MonoBehaviour
     public List<Block> ActivePlayerBlocks {
         get { return ActiveGamePlayer.Blocks; }
     }
+    public Weapon ActivePlayerWeapon
+    {
+        get { return ActiveGamePlayer.Weapon; }
+    }
 
     public enum Player {
         One,
@@ -25,6 +29,7 @@ public class GameController : MonoBehaviour
         public Player Player;
         public PlayerState State;
         public List<Block> Blocks;
+        public Weapon Weapon;
     }
 
     public GamePlayer PlayerOne;
