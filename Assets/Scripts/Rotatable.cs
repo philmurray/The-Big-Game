@@ -3,11 +3,12 @@ using System.Collections;
 
 public class Rotatable : MonoBehaviour {
 
-    public Vector3 Axis;
+    public Transform Axis;
     public float RotateStep;
     public float RotateSpeed;
 
     private float RotateProgress;
+    private float CurrentAngle;
 
     public void Update()
     {
@@ -15,7 +16,9 @@ public class Rotatable : MonoBehaviour {
         {
             bool gtz = RotateProgress > 0;
             float rotation = gtz ? RotateSpeed : -RotateSpeed;
-            transform.RotateAround(Axis, Vector3.up, rotation);
+
+            CurrentAngle += rotation;
+            transform.RotateAround(Axis.position, Vector3.up, rotation);
 
             RotateProgress -= rotation;
             if (gtz != (RotateProgress > 0))
@@ -37,5 +40,12 @@ public class Rotatable : MonoBehaviour {
         {
             RotateProgress = RotateStep;
         }
+    }
+
+    public void SetAngle(float angle)
+    {
+        float rotation = CurrentAngle - angle;
+        transform.RotateAround(Axis.position, Vector3.up, rotation);
+        CurrentAngle = angle;
     }
 }

@@ -32,13 +32,11 @@ public class WeaponContainer : MonoBehaviour {
 
     public void SelectWeapon(Weapon weapon)
     {
-        if (Weapon == null || Weapon.WeaponState.Type != weapon.Type)
-        {
-            RemoveWeapon();
-            var weaponObject = Instantiate(WeaponsDictionary[weapon.Type].gameObject) as GameObject;
-            weaponObject.transform.SetParent(transform, false);
-            Weapon = weaponObject.GetComponent<WeaponBehavior>();
-        }
+        RemoveWeapon();
+        var weaponObject = Instantiate(WeaponsDictionary[weapon.Type].gameObject) as GameObject;
+        weaponObject.transform.SetParent(transform, false);
+        Weapon = weaponObject.GetComponent<WeaponBehavior>();
+
         Weapon.SetState(weapon);
         Weapon.GetReady();
     }

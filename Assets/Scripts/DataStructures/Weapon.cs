@@ -15,7 +15,8 @@ namespace Assets.Scripts.DataStructures
         }
 
         public WeaponType Type;
-        public float Angle;
+        public float HorizontalAngle;
+        public float VerticalAngle;
         public float Power;
     }
 }

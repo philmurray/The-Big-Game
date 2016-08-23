@@ -75,6 +75,17 @@ public class ShootingSceneController : MonoBehaviour {
     public Camera IntroCamera;
     public Camera ProjectileFollowCamera;
 
+    public float MaxHorizontalAngle;
+    public float HorizontalAngleSpeed;
+
+    public float MaxVerticalAngle;
+    public float VerticalAngleSpeed;
+
+    public float MaxPower;
+    public float PowerConversion;
+    public float PowerSpeed;
+    public Text PowerText;
+
     void Start()
     {
         HUDController.instance.gameObject.SetActive(false);
@@ -124,13 +135,22 @@ public class ShootingSceneController : MonoBehaviour {
         SelectWeapon(Weapon.WeaponType.Crossbow);
     }
     public void SelectWeapon(Weapon.WeaponType weapon) {
-        ActivePlayer.SelectWeapon(weapon);
-        SelectWeaponMenu(weapon);
+        if (GameController.instance.ActivePlayerWeapon.Type != weapon)
+        {
+            ActivePlayer.SelectWeapon(weapon);
+            SelectWeaponMenu(weapon);
+        }
     }
 
     public void SelectWeaponMenu(Weapon.WeaponType weapon) {
-        WeaponsList.ForEach(w => w.SelectionButton.Select(false));
+        foreach (var weaponItem in WeaponsList) {
+            weaponItem.SelectionButton.Select(false);
+            weaponItem.WeaponMenu.SetActive(false);
+        }
         ActiveWeapon.SelectionButton.Select(true);
+        ActiveWeapon.WeaponMenu.SetActive(true);
+
+        UpdatePowerText();
     }
 
     public void PlayerReady()
@@ -185,5 +205,71 @@ public class ShootingSceneController : MonoBehaviour {
         {
             StartAim();
         }
+    }
+
+    public void AimLeft()
+    {
+        GameController.instance.ActivePlayerWeapon.HorizontalAngle += HorizontalAngleSpeed;
+        if (GameController.instance.ActivePlayerWeapon.HorizontalAngle > MaxHorizontalAngle) {
+            GameController.instance.ActivePlayerWeapon.HorizontalAngle = MaxHorizontalAngle;
+        }
+        ActivePlayer.UpdateWeapon();
+    }
+
+    public void AimRight()
+    {
+        GameController.instance.ActivePlayerWeapon.HorizontalAngle -= HorizontalAngleSpeed;
+        if (GameController.instance.ActivePlayerWeapon.HorizontalAngle < -MaxHorizontalAngle)
+        {
+            GameController.instance.ActivePlayerWeapon.HorizontalAngle = -MaxHorizontalAngle;
+        }
+        ActivePlayer.UpdateWeapon();
+    }
+
+    public void MorePower()
+    {
+        GameController.instance.ActivePlayerWeapon.Power += PowerSpeed;
+        if (GameController.instance.ActivePlayerWeapon.HorizontalAngle > MaxPower)
+        {
+            GameController.instance.ActivePlayerWeapon.HorizontalAngle = MaxPower;
+        }
+        UpdatePowerText();
+        ActivePlayer.UpdateWeapon();
+    }
+
+    private void UpdatePowerText()
+    {
+        PowerText.text = Mathf.RoundToInt(GameController.instance.ActivePlayerWeapon.Power).ToString();
+    }
+
+    public void LessPower()
+    {
+        GameController.instance.ActivePlayerWeapon.Power -= PowerSpeed;
+        if (GameController.instance.ActivePlayerWeapon.HorizontalAngle < 0)
+        {
+            GameController.instance.ActivePlayerWeapon.HorizontalAngle = 0;
+        }
+        UpdatePowerText();
+        ActivePlayer.UpdateWeapon();
+    }
+
+    public void AimUp()
+    {
+        GameController.instance.ActivePlayerWeapon.VerticalAngle += VerticalAngleSpeed;
+        if (GameController.instance.ActivePlayerWeapon.VerticalAngle > MaxVerticalAngle)
+        {
+            GameController.instance.ActivePlayerWeapon.VerticalAngle = MaxVerticalAngle;
+        }
+        ActivePlayer.UpdateWeapon();
+    }
+
+    public void AimDown()
+    {
+        GameController.instance.ActivePlayerWeapon.VerticalAngle -= VerticalAngleSpeed;
+        if (GameController.instance.ActivePlayerWeapon.VerticalAngle < 0)
+        {
+            GameController.instance.ActivePlayerWeapon.VerticalAngle = 0;
+        }
+        ActivePlayer.UpdateWeapon();
     }
 }

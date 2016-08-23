@@ -10,6 +10,7 @@ public class ShootingPlayerController : MonoBehaviour {
     public WeaponContainer WeaponContainer;
 
     public Camera AimCamera;
+    public Rotatable WeaponRotater;
 
     public Camera FireCamera;
     public float FireCameraWait;
@@ -138,6 +139,12 @@ public class ShootingPlayerController : MonoBehaviour {
         ShootingSceneController.instance.StopPlayerFiring();
         _incomingProjectile.transform.SetParent(BlockContainer.transform);
         _incomingProjectile = null;
+        HitCamera.GetComponent<HitCameraBehavior>().Reset();
         HitCamera.enabled = false;
+    }
+
+    public void UpdateWeapon()
+    {
+        WeaponRotater.SetAngle(GameController.instance.GetPlayer(Player).Weapon.HorizontalAngle);
     }
 }
