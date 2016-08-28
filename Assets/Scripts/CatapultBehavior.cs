@@ -11,4 +11,15 @@ public class CatapultBehavior : WeaponBehavior {
         ArmJoint.useSpring = true;
         return base.Fire();
     }
+
+    public override void StateUpdated()
+    {
+        ArmJoint.spring = new JointSpring
+        {
+            damper = ArmJoint.spring.damper,
+            targetPosition = ArmJoint.spring.targetPosition,
+            spring = ShootingSceneController.instance.CatapultPowerConversion(WeaponState.Power)
+        };
+        base.StateUpdated();
+    }
 }

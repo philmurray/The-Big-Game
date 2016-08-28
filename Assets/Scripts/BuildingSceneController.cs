@@ -31,8 +31,8 @@ public class BuildingSceneController : MonoBehaviour {
     public float TestingTime;
     private float TestingStart;
 
-    private BlockBehavior _selectedBlock;
-    public BlockBehavior SelectedBlock {
+    private BuildingBlockBehavior _selectedBlock;
+    public BuildingBlockBehavior SelectedBlock {
         set
         {
             if (_selectedBlock != null)
@@ -69,7 +69,7 @@ public class BuildingSceneController : MonoBehaviour {
                         });
                     }
                 }
-                BlockContainer.SetBlocks(GameController.instance.ActivePlayerBlocks);
+                BlockContainer.SetBlocks();
             }
             Destroy(GameObject.FindGameObjectWithTag("Modal"));
             HUDController.instance.gameObject.SetActive(true);
@@ -78,6 +78,8 @@ public class BuildingSceneController : MonoBehaviour {
 
     void Start()
     {
+        BlockContainer.Player = GameController.instance.ActivePlayer;
+        RealBlockContainer.Player = GameController.instance.ActivePlayer;
         HUDController.instance.gameObject.SetActive(false);
     }
 
@@ -95,7 +97,7 @@ public class BuildingSceneController : MonoBehaviour {
             }
         }
 
-        RealBlockContainer.SetBlocks(GameController.instance.ActivePlayerBlocks);
+        RealBlockContainer.SetBlocks();
         TestingStart = Time.fixedTime;
 
         StartCoroutine(AwaitPositionChange());

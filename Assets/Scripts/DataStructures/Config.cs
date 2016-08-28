@@ -23,12 +23,56 @@ namespace Assets.Scripts.DataStructures
             }
         }
 
+        public List<UpgradeConfig> Upgrades;
+
+        private Dictionary<PlayerState.Upgrade, Dictionary<string,string>> _upgradesDictionary;
+        public Dictionary<PlayerState.Upgrade, Dictionary<string, string>> UpgradesDictionary
+        {
+            get
+            {
+                if (_upgradesDictionary == null)
+                {
+                    _upgradesDictionary = new Dictionary<PlayerState.Upgrade, Dictionary<string, string>>();
+                    Upgrades.ForEach(b => _upgradesDictionary.Add(b.UpgradeType, b.Options));
+                }
+                return _upgradesDictionary;
+            }
+        }
+
         [Serializable]
         public class BlockConfig {
             public Block.BlockType BlockType;
             public Vector3 Size;
             public List<Vector3> Orientations;
             public bool IsSupport;
+            public float Mass;
+            public float Health;
+        }
+
+        [Serializable]
+        public class UpgradeConfig {
+            public PlayerState.Upgrade UpgradeType;
+            public List<KeyValue> OptionsList;
+
+
+            private Dictionary<string, string> _options;
+            public Dictionary<string, string> Options
+            {
+                get
+                {
+                    if (_options == null)
+                    {
+                        _options = new Dictionary<string, string>();
+                        OptionsList.ForEach(b => _options.Add(b.Key, b.Value));
+                    }
+                    return _options;
+                }
+            }
+        }
+        [Serializable]
+        public class KeyValue {
+            public string Key;
+            public string Value;
         }
     }
 }

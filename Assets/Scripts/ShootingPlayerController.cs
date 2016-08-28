@@ -23,7 +23,7 @@ public class ShootingPlayerController : MonoBehaviour {
     private GameObject _incomingProjectile;
 
     void Start() {
-        BlockContainer.SetBlocks(GameController.instance.GetPlayer(Player).Blocks);
+        BlockContainer.SetBlocks();
     }
 
     void FixedUpdate() {
@@ -146,5 +146,6 @@ public class ShootingPlayerController : MonoBehaviour {
     public void UpdateWeapon()
     {
         WeaponRotater.SetAngle(GameController.instance.GetPlayer(Player).Weapon.HorizontalAngle);
+        WeaponContainer.Weapon.StateUpdated();
     }
 }

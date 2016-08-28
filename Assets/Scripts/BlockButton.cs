@@ -8,11 +8,11 @@ public class BlockButton : MonoBehaviour {
 
     private GameObject DraggingBlock;
     public void StartDrag() {
-        if (BuildingSceneController.instance.AvailableBlocks(Block.GetComponent<BlockBehavior>().Block.Type) > 0)
+        if (BuildingSceneController.instance.AvailableBlocks(Block.GetComponent<BuildingBlockBehavior>().Block.Type) > 0)
         {
             DraggingBlock = Instantiate(Block) as GameObject;
             DraggingBlock.transform.SetParent(Parent);
-            var blockBehavior = DraggingBlock.GetComponent<BlockBehavior>();
+            var blockBehavior = DraggingBlock.GetComponent<BuildingBlockBehavior>();
 
             if (BuildingSceneController.instance.DefaultOrientation.ContainsKey(blockBehavior.Block.Type)) {
                 blockBehavior.Block.Orientation = BuildingSceneController.instance.DefaultOrientation[blockBehavior.Block.Type];
@@ -26,7 +26,7 @@ public class BlockButton : MonoBehaviour {
     public void EndDrag()
     {
         if (DraggingBlock != null) {
-            DraggingBlock.GetComponent<BlockBehavior>().OnMouseUp();
+            DraggingBlock.GetComponent<BuildingBlockBehavior>().OnMouseUp();
             DraggingBlock = null;
         }
     }

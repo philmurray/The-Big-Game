@@ -20,6 +20,35 @@ namespace Assets.Scripts.DataStructures
         }
 
         public BlockType Type;
+
+        public float Mass (GameController.Player player)
+        {
+            float mass = GameController.instance.Config.BlocksDictionary[Type].Mass;
+            foreach (var upgradeOptions in GameController.instance.GetPlayer(player).State.FindUpgradesWithOption("AffectsBlockMass"))
+            {
+                if (upgradeOptions["AffectsBlockMass"].Split(' ').Contains(Type.ToString()))
+                {
+                    mass *= float.Parse(upgradeOptions["MassModifier"]);
+                }
+            }
+            return mass;
+        }
+
+        public float Health (GameController.Player player)
+        {
+            float health = GameController.instance.Config.BlocksDictionary[Type].Health;
+            foreach (var upgradeOptions in GameController.instance.GetPlayer(player).State.FindUpgradesWithOption("AffectsBlockHealth"))
+            {
+                if (upgradeOptions["AffectsBlockHealth"].Split(' ').Contains(Type.ToString()))
+                {
+                    health *= float.Parse(upgradeOptions["HealthModifier"]);
+                }
+            }
+            return health;
+        }
+
+        #region tranform
+
         public Vector3 Position;
         public int Orientation;
 
@@ -48,31 +77,37 @@ namespace Assets.Scripts.DataStructures
             }
         }
 
+        public Vector3 InitialSize {
+            get {
+                return GameController.instance.Config.BlocksDictionary[Type].Size;
+            }
+        }
+
         public Vector3 Size
         {
             get
             {
-                Vector3 InitialSize = GameController.instance.Config.BlocksDictionary[Type].Size;
+                var tmpSize = InitialSize;
 
                 if (Orientations[Orientation].x == 90)
                 {
-                    float tmp = InitialSize.y;
-                    InitialSize.y = InitialSize.z;
-                    InitialSize.z = tmp;
+                    float tmp = tmpSize.y;
+                    tmpSize.y = tmpSize.z;
+                    tmpSize.z = tmp;
                 }
                 if (Orientations[Orientation].y == 90)
                 {
-                    float tmp = InitialSize.x;
-                    InitialSize.x = InitialSize.z;
-                    InitialSize.z = tmp;
+                    float tmp = tmpSize.x;
+                    tmpSize.x = tmpSize.z;
+                    tmpSize.z = tmp;
                 }
                 if (Orientations[Orientation].z == 90)
                 {
-                    float tmp = InitialSize.x;
-                    InitialSize.x = InitialSize.y;
-                    InitialSize.y = tmp;
+                    float tmp = tmpSize.x;
+                    tmpSize.x = tmpSize.y;
+                    tmpSize.y = tmp;
                 }
-                return InitialSize;
+                return tmpSize;
             }
         }
         public int MinX
@@ -119,5 +154,7 @@ namespace Assets.Scripts.DataStructures
                 return (int)Math.Round(Position.z + Size.z);
             }
         }
+
+        #endregion
     }
 }

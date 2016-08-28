@@ -81,8 +81,18 @@ public class ShootingSceneController : MonoBehaviour {
     public float MaxVerticalAngle;
     public float VerticalAngleSpeed;
 
+
+    //Mass 1: 1375
+    //Mass 2: 2350
+    //Mass 3: 3300
+    //Mass 4: 4525
+    public float MinPower;
+    //Mass 1: 1750
+    //Mass 2: 3200
+    //Mass 3: 4550
+    //Mass 4: 6000
     public float MaxPower;
-    public float PowerConversion;
+
     public float PowerSpeed;
     public Text PowerText;
 
@@ -124,6 +134,7 @@ public class ShootingSceneController : MonoBehaviour {
     private void StartPlayerAim(GameController.Player player) {
         GameController.instance.ActivePlayer = player;
         ActivePlayer.StartAiming();
+        HUDController.instance.Refresh();
         SelectWeaponMenu(GameController.instance.ActivePlayerWeapon.Type);
     }
 
@@ -229,9 +240,9 @@ public class ShootingSceneController : MonoBehaviour {
     public void MorePower()
     {
         GameController.instance.ActivePlayerWeapon.Power += PowerSpeed;
-        if (GameController.instance.ActivePlayerWeapon.HorizontalAngle > MaxPower)
+        if (GameController.instance.ActivePlayerWeapon.Power > 100)
         {
-            GameController.instance.ActivePlayerWeapon.HorizontalAngle = MaxPower;
+            GameController.instance.ActivePlayerWeapon.Power = 100;
         }
         UpdatePowerText();
         ActivePlayer.UpdateWeapon();
@@ -242,12 +253,16 @@ public class ShootingSceneController : MonoBehaviour {
         PowerText.text = Mathf.RoundToInt(GameController.instance.ActivePlayerWeapon.Power).ToString();
     }
 
+    public float CatapultPowerConversion(float power) {
+        return (power * (MaxPower - MinPower)) / 100 + MinPower;
+    }
+
     public void LessPower()
     {
         GameController.instance.ActivePlayerWeapon.Power -= PowerSpeed;
-        if (GameController.instance.ActivePlayerWeapon.HorizontalAngle < 0)
+        if (GameController.instance.ActivePlayerWeapon.Power < 0)
         {
-            GameController.instance.ActivePlayerWeapon.HorizontalAngle = 0;
+            GameController.instance.ActivePlayerWeapon.Power = 0;
         }
         UpdatePowerText();
         ActivePlayer.UpdateWeapon();

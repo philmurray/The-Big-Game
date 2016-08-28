@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 public class BlockContainer : MonoBehaviour {
 
+    public GameController.Player Player;
     public List<Block> Blocks;
     public List<BlockTypeItem> BlockObjects;
 
@@ -29,8 +30,9 @@ public class BlockContainer : MonoBehaviour {
         public GameObject BlockObject;
     }
 
-    public void SetBlocks(List<Block> blocks)
+    public void SetBlocks()
     {
+        var blocks = GameController.instance.GetPlayer(Player).Blocks;
         foreach (Transform child in transform)
         {
             GameObject.Destroy(child.gameObject);
@@ -45,11 +47,7 @@ public class BlockContainer : MonoBehaviour {
         if (bb != null)
         {
             bb.Block = block;
-        }
-        var rbb = go.GetComponent<RealBlockBehavior>();
-        if (rbb != null)
-        {
-            rbb.Block = block;
+            bb.Player = Player;
         }
         go.transform.SetParent(transform,false);
     }

@@ -1,188 +1,40 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Assets.Scripts.DataStructures;
-using System;
-using System.Collections.Generic;
 
-public class BlockBehavior : MonoBehaviour {
+public abstract class BlockBehavior : MonoBehaviour {
+
+    public GameController.Player Player;
     public Block Block;
-    public Material BadMaterial;
-    private Dictionary<Renderer, Material> GoodMaterials = new Dictionary<Renderer, Material>();
-    public Material SelectedMaterial;
-    public bool Draggable;
+    
+    private ModelSwitcher Models;
+    private bool TopCollider;
 
-    private bool isDragging;
-    private float dragHeight;
-    private bool isGood;
+    public virtual void Start()
+    {
+        Models = GetComponent<ModelSwitcher>();
+        SetModel("Normal");
 
-    private List<Renderer> Renderers;
-
-    void Start() {
-        Renderers = new List<Renderer>(GetComponentsInChildren<Renderer>());
+        var collider = GetComponent<BoxCollider>();
+        if (collider != null) {
+            collider.size = Block.InitialSize;
+            TopCollider = true;
+        }
     }
 
-    public void OnMouseDown()
+    public void SetModel(string name)
     {
-        if (Draggable)
+        if (Models.ModelsDictionary.ContainsKey(name))
         {
-            foreach (var b in GameController.instance.ActivePlayerBlocks)
-            {
-                if (Block.MinX < b.MaxX && Block.MaxX > b.MinX)
-                {
-                    if (Block.MinZ < b.MaxZ && Block.MaxZ > b.MinZ)
-                    {
-                        if (Block.MaxY == b.MinY)
-                        {
-                            return;
-                        }
-                    }
-                }
-            }
-
-            isDragging = true;
-            dragHeight = Block.TransformPosition.y;
-            BuildingSceneController.instance.SelectedBlock = null;
-            BuildingSceneController.instance.RemoveBlock(Block);
-        }
-    }
-
-    public void Select()
-    {
-        SetMaterial(SelectedMaterial);
-    }
-
-    public void Deselect()
-    {
-        Renderers.ForEach(r => r.material = GoodMaterials[r]);
-    }
-
-    public void Rotate()
-    {
-        Block.Orientation = (Block.Orientation + 1) % Block.Orientations.Count;
-        transform.rotation = Block.TransformRotation;
-        UpdatePosition(Block.Position);
-        if (!isGood) {
-            Rotate();
-        }
-    }
-
-    public void OnMouseUp() {
-        if (isDragging) {
-            isDragging = false;
-            if (isGood)
-            {
-                BuildingSceneController.instance.PlaceBlock(Block);
-                BuildingSceneController.instance.SelectedBlock = this;
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
-        }
-    }
-
-    private void RefreshCollisions()
-    {
-        List<Block> supportedBy = new List<Block>();
-
-        isGood = true;
-        foreach (var b in GameController.instance.ActivePlayerBlocks) {
-            if (b == Block)
-            {
-                continue;
-            }
-            if (Block.MinX < b.MaxX && Block.MaxX > b.MinX)
-            {
-                if (Block.MinZ < b.MaxZ && Block.MaxZ > b.MinZ)
-                {
-                    if (Block.MinY < b.MaxY && Block.MaxY > b.MinY)
-                    {
-                        if (b.IsSupport)
-                        {
-                            UpdatePosition(new Vector3(Block.Position.x, b.MaxY, Block.Position.z));
-                            return;
-                        }
-                        else
-                        {
-                            isGood = false;
-                        }
-                    }
-                    else if (Block.MinY == b.MaxY && b.IsSupport) {
-                        supportedBy.Add(b);
-                    }
-                }
-            }
-        }
-        if (supportedBy.Count == 0)
-        {
-            if (Block.MinY > 0)
-            {
-                UpdatePosition(new Vector3(Block.Position.x, 0, Block.Position.z));
-                return;
-            }
-            else
-            {
-                isGood = false;
-            }
-        }
-        if (Block.MaxY > BuildingSceneController.instance.MaxHeight)
-        {
-            isGood = false;
-        }
-        if (isGood)
-        {
-            SetMaterial(SelectedMaterial);
+            Models.ModelName = name;
         }
         else
         {
-            SetMaterial(BadMaterial);
+            Models.ModelName = name + "_" + Player;
         }
-    }
-
-    private void SetMaterial(Material material)
-    {
-        if (GoodMaterials.Count == 0)
+        if (TopCollider)
         {
-            Renderers.ForEach(r => GoodMaterials.Add(r, r.material));
-        }
-        Renderers.ForEach(r => r.material = material);
-    }
-
-    private void UpdatePosition(Vector3 pos)
-    {
-        Block.Position = pos;
-        transform.position = Block.TransformPosition;
-        RefreshCollisions();
-    }
-
-    void Update()
-    {
-        if (isDragging)
-        {
-            Plane plane = new Plane(Vector3.up, new Vector3(0, dragHeight, 0));
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            float distance;
-            if (plane.Raycast(ray, out distance))
-            {
-                Vector3 newPosition = ray.GetPoint(distance);
-                Vector3 gridPosition = new Vector3(Mathf.Round(newPosition.x), Block.Position.y, Mathf.Round(newPosition.z));
-                if (gridPosition != transform.position)
-                {
-                    if (gridPosition.x < 0 ||
-                        gridPosition.z < 0 ||
-                        gridPosition.x + Block.Size.x > BuildingSceneController.instance.BaseX ||
-                        gridPosition.z + Block.Size.z > BuildingSceneController.instance.BaseY)
-                    {
-                        transform.position = newPosition;
-                        SetMaterial(BadMaterial);
-                        isGood = false;
-                    }
-                    else
-                    {
-                        UpdatePosition(gridPosition);
-                    }
-                }
-            }
+            Models.Model.GetComponent<BoxCollider>().enabled = false;
         }
     }
 }

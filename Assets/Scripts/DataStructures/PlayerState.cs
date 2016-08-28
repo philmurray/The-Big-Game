@@ -44,6 +44,13 @@ namespace Assets.Scripts.DataStructures
             crystal
         };
 
+        public List<Dictionary<string, string>> FindUpgradesWithOption(string option)
+        {
+            return Upgrades
+                .FindAll(u => GameController.instance.Config.UpgradesDictionary.ContainsKey(u) && GameController.instance.Config.UpgradesDictionary[u].ContainsKey(option))
+                .ConvertAll<Dictionary<string, string>>(u => GameController.instance.Config.UpgradesDictionary[u]);
+        }
+
         public void ApplyUpgrade(Upgrade upgrade)
         {
             switch (upgrade)

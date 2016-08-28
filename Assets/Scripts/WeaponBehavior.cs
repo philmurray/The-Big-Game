@@ -28,5 +28,10 @@ public abstract class WeaponBehavior : MonoBehaviour
     }
     public virtual void SetState(Weapon weaponState) {
         WeaponState = weaponState;
+        StateUpdated();
+    }
+
+    public virtual void StateUpdated()
+    {
     }
 }
