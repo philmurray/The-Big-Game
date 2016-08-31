@@ -6,6 +6,8 @@ using System.Collections.Generic;
 
 public class WeaponContainer : MonoBehaviour {
 
+    public GameController.Player Player;
+
     public WeaponBehavior Weapon;
     public List<WeaponTypeItem> WeaponBehaviors;
 
@@ -37,6 +39,7 @@ public class WeaponContainer : MonoBehaviour {
         weaponObject.transform.SetParent(transform, false);
         Weapon = weaponObject.GetComponent<WeaponBehavior>();
 
+        Weapon.Player = Player;
         Weapon.SetState(weapon);
         Weapon.GetReady();
     }

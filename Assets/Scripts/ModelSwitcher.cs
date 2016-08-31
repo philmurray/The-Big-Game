@@ -34,12 +34,16 @@ public class ModelSwitcher : MonoBehaviour {
             return _modelName;
         }
         set {
-            if (_modelObject != null) {
-                Destroy(_modelObject);
+            if (_modelName != value)
+            {
+                if (_modelObject != null)
+                {
+                    Destroy(_modelObject);
+                }
+                _modelObject = Instantiate(ModelsDictionary[value]);
+                _modelObject.transform.SetParent(transform, false);
+                _modelName = value;
             }
-            _modelObject = Instantiate(ModelsDictionary[value]);
-            _modelObject.transform.SetParent(transform, false);
-            _modelName = value;
         }
     }
     public GameObject Model {

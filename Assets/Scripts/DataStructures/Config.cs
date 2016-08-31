@@ -39,6 +39,24 @@ namespace Assets.Scripts.DataStructures
             }
         }
 
+
+        public List<WeaponConfig> Weapons;
+
+        private Dictionary<Weapon.WeaponType, WeaponConfig> _weaponsDictionary;
+        public Dictionary<Weapon.WeaponType, WeaponConfig> WeaponsDictionary
+        {
+            get
+            {
+                if (_weaponsDictionary == null)
+                {
+                    _weaponsDictionary = new Dictionary<Weapon.WeaponType, WeaponConfig>();
+                    Weapons.ForEach(b => _weaponsDictionary.Add(b.WeaponType, b));
+                }
+                return _weaponsDictionary;
+            }
+        }
+
+
         [Serializable]
         public class BlockConfig {
             public Block.BlockType BlockType;
@@ -73,6 +91,14 @@ namespace Assets.Scripts.DataStructures
         public class KeyValue {
             public string Key;
             public string Value;
+        }
+
+        [Serializable]
+        public class WeaponConfig
+        {
+            public Weapon.WeaponType WeaponType;
+            public float ProjectileMass;
+            public float ProjectileDamage;
         }
     }
 }

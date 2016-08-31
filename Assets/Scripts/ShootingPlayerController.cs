@@ -64,6 +64,7 @@ public class ShootingPlayerController : MonoBehaviour {
         ToggleBlocks(false);
         ToggleWeapon(true);
         WeaponContainer.SelectWeapon(GameController.instance.GetPlayer(Player).Weapon);
+        UpdateWeapon();
     }
     public void EndAiming() {
         AimCamera.enabled = false;

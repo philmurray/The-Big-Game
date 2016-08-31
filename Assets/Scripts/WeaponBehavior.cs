@@ -10,6 +10,7 @@ public abstract class WeaponBehavior : MonoBehaviour
     public GameObject ProjectilePrefab;
     public Transform ProjectileSpawnPoint;
     public Weapon WeaponState;
+    public GameController.Player Player;
 
     private GameObject Projectile;
 
@@ -24,6 +25,8 @@ public abstract class WeaponBehavior : MonoBehaviour
         {
             Projectile = Instantiate(ProjectilePrefab, ProjectileSpawnPoint.position, Quaternion.identity) as GameObject;
             Projectile.transform.SetParent(transform, true);
+            Projectile.GetComponent<Rigidbody>().mass = WeaponState.ProjectileMass(Player);
+            Projectile.GetComponent<Damager>().Damage = WeaponState.ProjectileDamage(Player);
         }
     }
     public virtual void SetState(Weapon weaponState) {

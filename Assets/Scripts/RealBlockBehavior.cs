@@ -3,9 +3,7 @@ using System.Collections;
 using Assets.Scripts.DataStructures;
 
 public class RealBlockBehavior : BlockBehavior {
-    private float Health;
     private Rigidbody Rigidbody;
-    private bool Destructable;
     public override void Start ()
     {
         base.Start();
@@ -19,10 +17,10 @@ public class RealBlockBehavior : BlockBehavior {
             Rigidbody.isKinematic = true;
         }
 
-        Health = Block.Health(Player);
-        if (Mathf.Approximately(Health, 0.0f))
+        var destructable = GetComponent<Destructable>();
+        if (destructable != null)
         {
-            Destructable = false;
+            destructable.Health = Block.Health(Player);
         }
     }
 }

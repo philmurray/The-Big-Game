@@ -81,20 +81,10 @@ public class ShootingSceneController : MonoBehaviour {
     public float MaxVerticalAngle;
     public float VerticalAngleSpeed;
 
-
-    //Mass 1: 1375
-    //Mass 2: 2350
-    //Mass 3: 3300
-    //Mass 4: 4525
-    public float MinPower;
-    //Mass 1: 1750
-    //Mass 2: 3200
-    //Mass 3: 4550
-    //Mass 4: 6000
-    public float MaxPower;
-
     public float PowerSpeed;
     public Text PowerText;
+    private float MinPower;
+    private float MaxPower;
 
     void Start()
     {
@@ -133,6 +123,7 @@ public class ShootingSceneController : MonoBehaviour {
 
     private void StartPlayerAim(GameController.Player player) {
         GameController.instance.ActivePlayer = player;
+        SetPowerThresholds();
         ActivePlayer.StartAiming();
         HUDController.instance.Refresh();
         SelectWeaponMenu(GameController.instance.ActivePlayerWeapon.Type);
@@ -253,7 +244,15 @@ public class ShootingSceneController : MonoBehaviour {
         PowerText.text = Mathf.RoundToInt(GameController.instance.ActivePlayerWeapon.Power).ToString();
     }
 
-    public float CatapultPowerConversion(float power) {
+    public void SetPowerThresholds()
+    {
+        float mass = GameController.instance.ActivePlayerWeapon.ProjectileMass(GameController.instance.ActivePlayer);
+        MinPower = 400 + 975 * mass;
+        MaxPower = 300 + 1450 * mass;
+    }
+
+    public float CatapultPowerConversion(float power)
+    {
         return (power * (MaxPower - MinPower)) / 100 + MinPower;
     }
 
