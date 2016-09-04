@@ -16,7 +16,9 @@ namespace Assets.Scripts.DataStructures
             Large,
             Huge,
             Flag,
-            Crystal
+            Crystal,
+            SmallBlockPiece,
+            LargeBlockPiece
         }
 
         public BlockType Type;

@@ -28,7 +28,7 @@ public abstract class BlockBehavior : MonoBehaviour {
         {
             Models.ModelName = name;
         }
-        else
+        else if (Models.ModelsDictionary.ContainsKey(name + "_" + Player))
         {
             Models.ModelName = name + "_" + Player;
         }

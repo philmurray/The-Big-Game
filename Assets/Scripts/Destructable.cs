@@ -4,26 +4,13 @@ using System;
 
 public class Destructable : MonoBehaviour {
 
-    public float Health {
-        get {
-            return _currentHealth;
-        }
-        set {
-            _initialHealth = value;
-            if (_currentHealth == 0.0f)
-            {
-                _currentHealth = _initialHealth;
-            }
-        }
-    }
-    private float _currentHealth;
-    private float _initialHealth;
+    public float DamageThreshold;
+    public float Health;
 
     void OnCollisionEnter(Collision collision)
     {
-        var rbb = GetComponent<RealBlockBehavior>();
         var rb = collision.rigidbody;
-        if (rbb != null && rb != null)
+        if (rb != null && Health > 0)
         {
             float damageFactor = 1;
             var damager = collision.gameObject.GetComponent<Damager>();
@@ -32,27 +19,30 @@ public class Destructable : MonoBehaviour {
                 damageFactor = damager.Damage;
             }
             var magnitude = Vector3.Magnitude(collision.relativeVelocity) * rb.mass;
-            if (magnitude > 10)
+            if (magnitude > DamageThreshold)
             {
-                Debug.Log(rbb.Block.Type + " " + magnitude);
                 var damage = magnitude * damageFactor;
-                Debug.Log(rbb.Block.Type + " " + _currentHealth + " - " + damage);
 
-                _currentHealth -= magnitude * damageFactor;
-                if (_currentHealth < 0)
+                Health -= magnitude * damageFactor;
+                if (Health < 0)
                 {
-                    rb.velocity = collision.relativeVelocity;
-                    Destroy(gameObject);
+                    OnDestroyed(collision);
                 }
-                else if (_currentHealth / _initialHealth < 0.33f)
+                else
                 {
-                    rbb.SetModel("VeryDamaged");
-                }
-                else if (_currentHealth / _initialHealth < 0.66f)
-                {
-                    rbb.SetModel("Damaged");
+                    OnDamaged(collision);
                 }
             }
         }
+    }
+
+    public virtual void OnDamaged(Collision collision)
+    {
+
+    }
+
+    public virtual void OnDestroyed(Collision collision)
+    {
+        Destroy(gameObject);
     }
 }

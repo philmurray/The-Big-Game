@@ -17,7 +17,7 @@ public class RealBlockBehavior : BlockBehavior {
             Rigidbody.isKinematic = true;
         }
 
-        var destructable = GetComponent<Destructable>();
+        var destructable = GetComponent<DestructableBlock>();
         if (destructable != null)
         {
             destructable.Health = Block.Health(Player);
