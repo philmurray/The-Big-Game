@@ -1,26 +1,83 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Assets.Scripts.DataStructures;
+using System.Linq;
 
 public class RealBlockBehavior : BlockBehavior {
+    public float Multiplier;
+
     private Rigidbody Rigidbody;
+    private Destructable Destructable;
     public override void Start ()
     {
         base.Start();
 
         Rigidbody = GetComponent<Rigidbody>();
-
-        var mass = Block.Mass(Player);
-        Rigidbody.mass = mass;
-        if (Mathf.Approximately(mass, 0.0f))
+        Destructable = GetComponent<DestructableBlock>();
+        if (Destructable == null)
         {
-            Rigidbody.isKinematic = true;
+            Destructable = GetComponent<Destructable>();
         }
 
-        var destructable = GetComponent<DestructableBlock>();
-        if (destructable != null)
+        InitializeMass();
+        InitializeHealth();
+    }
+
+    public float Health
+    {
+        get
         {
-            destructable.Health = Block.Health(Player);
+            return Destructable != null ? Destructable.Health : 0.0f;
+        }
+    }
+
+    private float _initialHealth;
+    public float InitialHealth
+    {
+        get
+        {
+            return _initialHealth;
+        }
+    }
+
+    public float Mass
+    {
+        get
+        {
+            return Rigidbody != null ? Rigidbody.mass : 0.0f;
+        }
+    }
+
+    private void InitializeMass()
+    {
+        if (Rigidbody != null)
+        {
+            float mass = Rigidbody.mass * Multiplier;
+            foreach (var upgradeOptions in GameController.instance.GetPlayer(Player).State.FindUpgradesWithOption("AffectsBlockMass"))
+            {
+                if (upgradeOptions["AffectsBlockMass"].Split(' ').Contains(Block.Type.ToString()))
+                {
+                    mass *= float.Parse(upgradeOptions["MassModifier"]);
+                }
+            }
+            Rigidbody.mass = mass;
+        }
+    }
+
+    private void InitializeHealth()
+    {
+        if (Destructable != null)
+        {
+            float health = Destructable.Health * Multiplier;
+            foreach (var upgradeOptions in GameController.instance.GetPlayer(Player).State.FindUpgradesWithOption("AffectsBlockHealth"))
+            {
+                if (upgradeOptions["AffectsBlockHealth"].Split(' ').Contains(Block.Type.ToString()))
+                {
+                    health *= float.Parse(upgradeOptions["HealthModifier"]);
+                }
+            }
+            _initialHealth = health;
+            Destructable.Health = health;
         }
     }
 }

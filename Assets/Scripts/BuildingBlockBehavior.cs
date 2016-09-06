@@ -6,22 +6,29 @@ using System.Collections.Generic;
 
 public class BuildingBlockBehavior : BlockBehavior {
     public bool Draggable;
+    public bool IsSupport;
 
     private bool isDragging;
     private float dragHeight;
     private bool isGood;
 
+
+
     public void OnMouseDown()
     {
         if (Draggable)
         {
-            foreach (var b in GameController.instance.ActivePlayerBlocks)
+            foreach (var b in transform.parent.GetComponentsInChildren<BuildingBlockBehavior>())
             {
-                if (Block.MinX < b.MaxX && Block.MaxX > b.MinX)
+                if (b == this)
                 {
-                    if (Block.MinZ < b.MaxZ && Block.MaxZ > b.MinZ)
+                    continue;
+                }
+                if (MinX < b.MaxX && MaxX > b.MinX)
+                {
+                    if (MinZ < b.MaxZ && MaxZ > b.MinZ)
                     {
-                        if (Block.MaxY == b.MinY)
+                        if (MaxY == b.MinY)
                         {
                             return;
                         }
@@ -29,7 +36,7 @@ public class BuildingBlockBehavior : BlockBehavior {
                 }
             }
             isDragging = true;
-            dragHeight = Block.TransformPosition.y;
+            dragHeight = TransformPosition.y;
             BuildingSceneController.instance.SelectedBlock = null;
             BuildingSceneController.instance.RemoveBlock(Block);
         }
@@ -52,8 +59,8 @@ public class BuildingBlockBehavior : BlockBehavior {
 
     public void Rotate()
     {
-        Block.Orientation = (Block.Orientation + 1) % Block.Orientations.Count;
-        transform.rotation = Block.TransformRotation;
+        Block.Orientation = (Block.Orientation + 1) % Orientations.Count;
+        transform.rotation = TransformRotation;
         UpdatePosition(Block.Position);
         if (!isGood) {
             Rotate();
@@ -78,19 +85,19 @@ public class BuildingBlockBehavior : BlockBehavior {
 
     private void RefreshCollisions()
     {
-        List<Block> supportedBy = new List<Block>();
+        List<BuildingBlockBehavior> supportedBy = new List<BuildingBlockBehavior>();
 
         isGood = true;
-        foreach (var b in GameController.instance.ActivePlayerBlocks) {
-            if (b == Block)
+        foreach (var b in transform.parent.GetComponentsInChildren<BuildingBlockBehavior>()) {
+            if (b == this)
             {
                 continue;
             }
-            if (Block.MinX < b.MaxX && Block.MaxX > b.MinX)
+            if (MinX < b.MaxX && MaxX > b.MinX)
             {
-                if (Block.MinZ < b.MaxZ && Block.MaxZ > b.MinZ)
+                if (MinZ < b.MaxZ && MaxZ > b.MinZ)
                 {
-                    if (Block.MinY < b.MaxY && Block.MaxY > b.MinY)
+                    if (MinY < b.MaxY && MaxY > b.MinY)
                     {
                         if (b.IsSupport)
                         {
@@ -102,7 +109,7 @@ public class BuildingBlockBehavior : BlockBehavior {
                             isGood = false;
                         }
                     }
-                    else if (Block.MinY == b.MaxY && b.IsSupport) {
+                    else if (MinY == b.MaxY && b.IsSupport) {
                         supportedBy.Add(b);
                     }
                 }
@@ -110,7 +117,7 @@ public class BuildingBlockBehavior : BlockBehavior {
         }
         if (supportedBy.Count == 0)
         {
-            if (Block.MinY > 0)
+            if (MinY > 0)
             {
                 UpdatePosition(new Vector3(Block.Position.x, 0, Block.Position.z));
                 return;
@@ -120,7 +127,7 @@ public class BuildingBlockBehavior : BlockBehavior {
                 isGood = false;
             }
         }
-        if (Block.MaxY > BuildingSceneController.instance.MaxHeight)
+        if (MaxY > BuildingSceneController.instance.MaxHeight)
         {
             isGood = false;
         }
@@ -137,7 +144,7 @@ public class BuildingBlockBehavior : BlockBehavior {
     private void UpdatePosition(Vector3 pos)
     {
         Block.Position = pos;
-        transform.position = Block.TransformPosition;
+        transform.position = TransformPosition;
         RefreshCollisions();
     }
 
@@ -156,8 +163,8 @@ public class BuildingBlockBehavior : BlockBehavior {
                 {
                     if (gridPosition.x < 0 ||
                         gridPosition.z < 0 ||
-                        gridPosition.x + Block.Size.x > BuildingSceneController.instance.BaseX ||
-                        gridPosition.z + Block.Size.z > BuildingSceneController.instance.BaseY)
+                        gridPosition.x + Size.x > BuildingSceneController.instance.BaseX ||
+                        gridPosition.z + Size.z > BuildingSceneController.instance.BaseY)
                     {
                         transform.position = newPosition;
                         Bad();
@@ -169,6 +176,51 @@ public class BuildingBlockBehavior : BlockBehavior {
                     }
                 }
             }
+        }
+    }
+
+    private int MinX
+    {
+        get
+        {
+            return (int)Math.Round(Block.Position.x);
+        }
+    }
+    private float MaxX
+    {
+        get
+        {
+            return (int)Math.Round(Block.Position.x + Size.x);
+        }
+    }
+
+    private float MinY
+    {
+        get
+        {
+            return (int)Math.Round(Block.Position.y);
+        }
+    }
+    private float MaxY
+    {
+        get
+        {
+            return (int)Math.Round(Block.Position.y + Size.y);
+        }
+    }
+
+    private float MinZ
+    {
+        get
+        {
+            return (int)Math.Round(Block.Position.z);
+        }
+    }
+    private float MaxZ
+    {
+        get
+        {
+            return (int)Math.Round(Block.Position.z + Size.z);
         }
     }
 }

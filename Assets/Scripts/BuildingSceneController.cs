@@ -46,7 +46,7 @@ public class BuildingSceneController : MonoBehaviour {
                 _selectedBlock.Select();
             }
             SelectionMenu.SetActive(_selectedBlock != null);
-            RotateButton.SetActive(_selectedBlock != null && _selectedBlock.Block.Orientations.Count > 1);
+            RotateButton.SetActive(_selectedBlock != null && _selectedBlock.Orientations.Count > 1);
         }
         get {
             return _selectedBlock;
@@ -135,7 +135,7 @@ public class BuildingSceneController : MonoBehaviour {
                 var trans = child as Transform;
                 if (trans != null)
                 {
-                    var bp = trans.gameObject.GetComponent<RealBlockBehavior>().Block.TransformPosition;
+                    var bp = trans.gameObject.GetComponent<RealBlockBehavior>().TransformPosition;
                     var dist = Vector3.Distance(trans.position, bp);
                     if (dist > 0.25f)
                     {

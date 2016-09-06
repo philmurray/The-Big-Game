@@ -7,7 +7,7 @@ using System.Linq;
 public class DestructableBlock : Destructable {
 
     public RealBlockBehavior SmallBlockPiece;
-
+    public RealBlockBehavior LargeBlockPiece;
 
     private RealBlockBehavior _rbb;
 
@@ -18,7 +18,7 @@ public class DestructableBlock : Destructable {
 
     public override void OnDamaged(Collision collision)
     {
-        var initialHealth = _rbb.Block.Health(_rbb.Player);
+        var initialHealth = _rbb.InitialHealth;
         if (Health / initialHealth < 0.33f)
         {
             _rbb.SetModel("VeryDamaged");
@@ -42,7 +42,7 @@ public class DestructableBlock : Destructable {
         var collisionPoint = transform.InverseTransformPoint(collision.contacts[0].point);
 
 
-        var blockSize = _rbb.Block.InitialSize;
+        var blockSize = _rbb.InitialSize;
         List<BlockUnit> points = new List<BlockUnit>();
         for (int x = 0; x < blockSize.x; x++)
         {
@@ -108,7 +108,15 @@ public class DestructableBlock : Destructable {
 
     private void CreateLargePiece(List<float> pos, List<float> size)
     {
-        Debug.Log("creating a large piece");
+        var b = Instantiate(LargeBlockPiece, transform.parent) as RealBlockBehavior;
+        b.InitialSize = new Vector3(size[0], size[1], size[2]);
+        b.Multiplier = size[0] * size[1] * size[2];
+
+        var localPosition = new Vector3(pos[0], pos[1], pos[2]);
+
+        b.transform.position = transform.TransformPoint(localPosition);
+        b.transform.rotation = transform.rotation;
+        b.GetComponent<Rigidbody>().velocity = GetComponent<Rigidbody>().velocity;
     }
 
     private void CreateSmallPieces(Vector3 pos)
@@ -129,11 +137,11 @@ public class DestructableBlock : Destructable {
     private void CreateBlockPiece(Vector3 localCenter, Vector3 position)
     {
         var b = Instantiate(SmallBlockPiece, transform.parent) as RealBlockBehavior;
-
+        var blockSize = b.Size;
         var localPosition = new Vector3(
-            localCenter.x + (Mathf.Approximately(position.x, 0.0f) ? position.x : position.x > 0 ? position.x - b.Block.Size.x / 2 : position.x + b.Block.Size.x / 2),
-            localCenter.y + (Mathf.Approximately(position.y, 0.0f) ? position.y : position.y > 0 ? position.y - b.Block.Size.y / 2 : position.y + b.Block.Size.y / 2),
-            localCenter.z + (Mathf.Approximately(position.z, 0.0f) ? position.z : position.z > 0 ? position.z - b.Block.Size.z / 2 : position.z + b.Block.Size.z / 2)
+            localCenter.x + (Mathf.Approximately(position.x, 0.0f) ? position.x : position.x > 0 ? position.x - blockSize.x / 2 : position.x + blockSize.x / 2),
+            localCenter.y + (Mathf.Approximately(position.y, 0.0f) ? position.y : position.y > 0 ? position.y - blockSize.y / 2 : position.y + blockSize.y / 2),
+            localCenter.z + (Mathf.Approximately(position.z, 0.0f) ? position.z : position.z > 0 ? position.z - blockSize.z / 2 : position.z + blockSize.z / 2)
         );
 
         b.transform.position = transform.TransformPoint(localPosition);

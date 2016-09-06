@@ -42,11 +42,13 @@ public class BlockContainer : MonoBehaviour {
     }
     public void AddBlock(Block block)
     {
-        var go = Instantiate(BlockObjectsDictionary[block.Type], block.TransformPosition, block.TransformRotation) as GameObject;
+        var go = Instantiate(BlockObjectsDictionary[block.Type]) as GameObject;
         var bb = go.GetComponent<BlockBehavior>();
         if (bb != null)
         {
             bb.Block = block;
+            bb.transform.position = bb.TransformPosition;
+            bb.transform.rotation = bb.TransformRotation;
             bb.Player = Player;
         }
         go.transform.SetParent(transform,false);

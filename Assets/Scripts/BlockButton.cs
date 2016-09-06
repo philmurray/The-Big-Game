@@ -18,8 +18,8 @@ public class BlockButton : MonoBehaviour {
                 blockBehavior.Block.Orientation = BuildingSceneController.instance.DefaultOrientation[blockBehavior.Block.Type];
             }
             blockBehavior.Block.Position = new Vector3(100, 1, 100);
-            blockBehavior.transform.position = blockBehavior.Block.TransformPosition;
-            blockBehavior.transform.rotation = blockBehavior.Block.TransformRotation;
+            blockBehavior.transform.position = blockBehavior.TransformPosition;
+            blockBehavior.transform.rotation = blockBehavior.TransformRotation;
             blockBehavior.OnMouseDown();
         }
     }

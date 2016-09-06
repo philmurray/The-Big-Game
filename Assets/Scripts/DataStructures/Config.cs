@@ -9,20 +9,6 @@ namespace Assets.Scripts.DataStructures
     [Serializable]
     public class Config
     {
-        public List<BlockConfig> Blocks;
-
-        private Dictionary<Block.BlockType, BlockConfig> _blocksDictionary;
-        public Dictionary<Block.BlockType, BlockConfig> BlocksDictionary {
-            get
-            {
-                if (_blocksDictionary == null) {
-                    _blocksDictionary = new Dictionary<Block.BlockType, BlockConfig>();
-                    Blocks.ForEach(b => _blocksDictionary.Add(b.BlockType, b));
-                }
-                return _blocksDictionary;
-            }
-        }
-
         public List<UpgradeConfig> Upgrades;
 
         private Dictionary<PlayerState.Upgrade, Dictionary<string,string>> _upgradesDictionary;
@@ -54,17 +40,6 @@ namespace Assets.Scripts.DataStructures
                 }
                 return _weaponsDictionary;
             }
-        }
-
-
-        [Serializable]
-        public class BlockConfig {
-            public Block.BlockType BlockType;
-            public Vector3 Size;
-            public List<Vector3> Orientations;
-            public bool IsSupport;
-            public float Mass;
-            public float Health;
         }
 
         [Serializable]
