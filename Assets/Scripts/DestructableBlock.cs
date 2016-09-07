@@ -70,9 +70,8 @@ public class DestructableBlock : Destructable {
         List<float> size = new List<float> { blockSize.x, blockSize.y, blockSize.z };
         List<float> index = new List<float> { quad.Index.x, quad.Index.y, quad.Index.z };
 
-        SliceDimension(0, position, size, index);
-        SliceDimension(1, position, size, index);
-        SliceDimension(2, position, size, index);
+        List<int> dimensions = new List<int> { 0, 1, 2 };
+        dimensions.OrderBy(x => UnityEngine.Random.value).ToList().ForEach(d => SliceDimension(d, position, size, index));
     }
 
     private void SliceDimension(int dimension, List<float> position, List<float> size, List<float> index)
@@ -81,22 +80,22 @@ public class DestructableBlock : Destructable {
         {
             if (index[dimension] > 0.0f) {
 
-                List<float> piecePos = new List<float>(position);
-                piecePos[dimension] = position[dimension] - (0.5f + (index[dimension]) / 2);
-                
                 List<float> pieceSize = new List<float>(size);
                 pieceSize[dimension] = index[dimension];
+
+                List<float> piecePos = new List<float>(position);
+                piecePos[dimension] = position[dimension] - (size[dimension] - pieceSize[dimension]) / 2;
 
                 CreateLargePiece(piecePos, pieceSize);
             }
 
             if (index[dimension] < size[dimension] - 1)
             {
-                List<float> piecePos = new List<float>(position);
-                piecePos[dimension] = position[dimension] + (0.5f + ((size[dimension] - 1) - index[dimension]) / 2);
-
                 List<float> pieceSize = new List<float>(size);
                 pieceSize[dimension] = (size[dimension] - 1) - index[dimension];
+
+                List<float> piecePos = new List<float>(position);
+                piecePos[dimension] = position[dimension] + (size[dimension] - pieceSize[dimension]) / 2;
 
                 CreateLargePiece(piecePos, pieceSize);
             }
