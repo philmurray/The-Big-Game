@@ -3,11 +3,12 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Scripts.DataStructures;
 
 public class DestructableBlock : Destructable {
 
-    public RealBlockBehavior SmallBlockPiece;
-    public RealBlockBehavior LargeBlockPiece;
+    public Block.BlockType SmallBlockPiece;
+    public Block.BlockType LargeBlockPiece;
 
     private RealBlockBehavior _rbb;
 
@@ -107,7 +108,7 @@ public class DestructableBlock : Destructable {
 
     private void CreateLargePiece(List<float> pos, List<float> size)
     {
-        var b = Instantiate(LargeBlockPiece, transform.parent) as RealBlockBehavior;
+        var b = _rbb.ParentContainer.AddBlock(LargeBlockPiece).GetComponent<RealBlockBehavior>();
         b.InitialSize = new Vector3(size[0], size[1], size[2]);
         b.Multiplier = size[0] * size[1] * size[2];
 
@@ -115,7 +116,7 @@ public class DestructableBlock : Destructable {
 
         b.transform.position = transform.TransformPoint(localPosition);
         b.transform.rotation = transform.rotation;
-        b.GetComponent<Rigidbody>().velocity = GetComponent<Rigidbody>().velocity;
+        b.GetComponent<Rigidbody>().velocity = GetComponent<Rigidbody>().velocity * 0.75f;
     }
 
     private void CreateSmallPieces(Vector3 pos)
@@ -135,7 +136,7 @@ public class DestructableBlock : Destructable {
 
     private void CreateBlockPiece(Vector3 localCenter, Vector3 position)
     {
-        var b = Instantiate(SmallBlockPiece, transform.parent) as RealBlockBehavior;
+        var b = _rbb.ParentContainer.AddBlock(SmallBlockPiece).GetComponent<RealBlockBehavior>();
         var blockSize = b.Size;
         var localPosition = new Vector3(
             localCenter.x + (Mathf.Approximately(position.x, 0.0f) ? position.x : position.x > 0 ? position.x - blockSize.x / 2 : position.x + blockSize.x / 2),
@@ -145,6 +146,6 @@ public class DestructableBlock : Destructable {
 
         b.transform.position = transform.TransformPoint(localPosition);
         b.transform.rotation = transform.rotation;
-        b.GetComponent<Rigidbody>().velocity = GetComponent<Rigidbody>().velocity;
+        b.GetComponent<Rigidbody>().velocity = GetComponent<Rigidbody>().velocity * 0.75f;
     }
 }

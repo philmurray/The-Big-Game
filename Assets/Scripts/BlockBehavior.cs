@@ -89,4 +89,12 @@ public abstract class BlockBehavior : MonoBehaviour {
             return tmpSize;
         }
     }
+
+    public BlockContainer ParentContainer
+    {
+        get
+        {
+            return transform.parent.GetComponent<BlockContainer>();
+        }
+    }
 }

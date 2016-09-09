@@ -40,7 +40,7 @@ public class BlockContainer : MonoBehaviour {
         Blocks = blocks;
         Blocks.ForEach(b => AddBlock(b));
     }
-    public void AddBlock(Block block)
+    public GameObject AddBlock(Block block)
     {
         var go = Instantiate(BlockObjectsDictionary[block.Type]) as GameObject;
         var bb = go.GetComponent<BlockBehavior>();
@@ -52,5 +52,17 @@ public class BlockContainer : MonoBehaviour {
             bb.Player = Player;
         }
         go.transform.SetParent(transform,false);
+        return go;
+    }
+    public GameObject AddBlock(Block.BlockType block)
+    {
+        var go = Instantiate(BlockObjectsDictionary[block]) as GameObject;
+        var bb = go.GetComponent<BlockBehavior>();
+        if (bb != null)
+        {
+            bb.Player = Player;
+        }
+        go.transform.SetParent(transform, false);
+        return go;
     }
 }
