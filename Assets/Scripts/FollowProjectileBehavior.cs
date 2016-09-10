@@ -3,7 +3,7 @@ using System.Collections;
 
 public class FollowProjectileBehavior : MonoBehaviour {
 
-    public GameObject Target;
+    public ProjectileBehavior Target;
 	
 	// Update is called once per frame
 	void Update () {

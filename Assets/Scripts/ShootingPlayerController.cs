@@ -20,7 +20,7 @@ public class ShootingPlayerController : MonoBehaviour {
     public Transform HitTarget;
     public float HitTargetDistance;
     
-    private GameObject _incomingProjectile;
+    private ProjectileBehavior _incomingProjectile;
 
     void Start() {
         BlockContainer.SetBlocks();
@@ -83,7 +83,7 @@ public class ShootingPlayerController : MonoBehaviour {
     private IEnumerator WaitToFire()
     {
         yield return new WaitForSeconds(FireWait);
-        GameObject projectile = WeaponContainer.Weapon.Fire();
+        var projectile = WeaponContainer.Weapon.Fire();
         yield return new WaitForSeconds(FireCameraWait);
         ShootingSceneController.instance.StartProjectileFollow(projectile);
         EndShooting();
@@ -124,7 +124,7 @@ public class ShootingPlayerController : MonoBehaviour {
         }
     }
 
-    public void WaitForProjectile(GameObject projectile)
+    public void WaitForProjectile(ProjectileBehavior projectile)
     {
         _incomingProjectile = projectile;
     }

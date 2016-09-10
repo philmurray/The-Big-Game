@@ -12,9 +12,9 @@ public abstract class WeaponBehavior : MonoBehaviour
     public Weapon WeaponState;
     public GameController.Player Player;
 
-    private GameObject Projectile;
+    protected ProjectileBehavior Projectile;
 
-    public virtual GameObject Fire() {
+    public virtual ProjectileBehavior Fire() {
         var p = Projectile;
         Projectile.transform.SetParent(null, true);
         Projectile = null;
@@ -23,10 +23,12 @@ public abstract class WeaponBehavior : MonoBehaviour
     public virtual void GetReady() {
         if (Projectile == null)
         {
-            Projectile = Instantiate(ProjectilePrefab, ProjectileSpawnPoint.position, Quaternion.identity) as GameObject;
+            var go = Instantiate(ProjectilePrefab, ProjectileSpawnPoint.position, Quaternion.identity) as GameObject;
+            Projectile = go.GetComponent<ProjectileBehavior>();
             Projectile.transform.SetParent(transform, true);
-            Projectile.GetComponent<Rigidbody>().mass = WeaponState.ProjectileMass(Player);
-            Projectile.GetComponent<Damager>().Damage = WeaponState.ProjectileDamage(Player);
+
+            Projectile.Weapon = WeaponState;
+            Projectile.Player = Player;
         }
     }
     public virtual void SetState(Weapon weaponState) {
@@ -34,7 +36,5 @@ public abstract class WeaponBehavior : MonoBehaviour
         StateUpdated();
     }
 
-    public virtual void StateUpdated()
-    {
-    }
+    public virtual void StateUpdated() { }
 }

@@ -83,8 +83,6 @@ public class ShootingSceneController : MonoBehaviour {
 
     public float PowerSpeed;
     public Text PowerText;
-    private float MinPower;
-    private float MaxPower;
 
     void Start()
     {
@@ -123,7 +121,6 @@ public class ShootingSceneController : MonoBehaviour {
 
     private void StartPlayerAim(GameController.Player player) {
         GameController.instance.ActivePlayer = player;
-        SetPowerThresholds();
         ActivePlayer.StartAiming();
         HUDController.instance.Refresh();
         SelectWeaponMenu(GameController.instance.ActivePlayerWeapon.Type);
@@ -187,7 +184,7 @@ public class ShootingSceneController : MonoBehaviour {
         ActivePlayer.StartShooting();
     }
 
-    public void StartProjectileFollow(GameObject projectile) {
+    public void StartProjectileFollow(ProjectileBehavior projectile) {
         ProjectileFollowCamera.enabled = true;
         ProjectileFollowCamera.gameObject.GetComponent<FollowProjectileBehavior>().Target = projectile;
         OtherPlayer.WaitForProjectile(projectile);
@@ -242,18 +239,6 @@ public class ShootingSceneController : MonoBehaviour {
     private void UpdatePowerText()
     {
         PowerText.text = Mathf.RoundToInt(GameController.instance.ActivePlayerWeapon.Power).ToString();
-    }
-
-    public void SetPowerThresholds()
-    {
-        float mass = GameController.instance.ActivePlayerWeapon.ProjectileMass(GameController.instance.ActivePlayer);
-        MinPower = 400 + 975 * mass;
-        MaxPower = 300 + 1450 * mass;
-    }
-
-    public float CatapultPowerConversion(float power)
-    {
-        return (power * (MaxPower - MinPower)) / 100 + MinPower;
     }
 
     public void LessPower()
