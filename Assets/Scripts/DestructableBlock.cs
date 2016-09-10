@@ -12,8 +12,9 @@ public class DestructableBlock : Destructable {
 
     private RealBlockBehavior _rbb;
 
-    void Start()
+    public override void Start()
     {
+        base.Start();
         _rbb = GetComponent<RealBlockBehavior>();
     }
 

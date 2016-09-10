@@ -3,35 +3,47 @@ using System.Collections;
 using System;
 
 public class Destructable : MonoBehaviour {
-
-    public float DamageThreshold;
+    
     public float Health;
+
+    private Rigidbody _rigidBody;
+    private Vector3 _previousVelocity;
+
+    public virtual void Start ()
+    {
+        _rigidBody = GetComponent<Rigidbody>();
+    }
+
+    void FixedUpdate ()
+    {
+        _previousVelocity = _rigidBody.velocity;
+    }
 
     void OnCollisionEnter(Collision collision)
     {
-        var rb = collision.rigidbody;
-        if (rb != null && Health > 0)
+        var changeInVelocity = Vector3.Magnitude((_rigidBody.velocity - _previousVelocity));
+        var force = changeInVelocity / Time.fixedDeltaTime * _rigidBody.mass;
+        InflictDamage(force, collision);
+
+        var destructable = collision.gameObject.GetComponent<Destructable>();
+        if (destructable != null)
         {
-            float damageFactor = 1;
-            var damager = collision.gameObject.GetComponent<Damager>();
+            destructable.InflictDamage(force, collision);
+        }
+    }
 
-            if (damager != null) {
-                damageFactor = damager.Damage;
-            }
-            var magnitude = Vector3.Magnitude(collision.relativeVelocity) * rb.mass;
-            if (magnitude > DamageThreshold)
+    public virtual void InflictDamage(float damage, Collision collision)
+    {
+        if (Health > 0)
+        {
+            Health -= damage;
+            if (Health < 0)
             {
-                var damage = magnitude * damageFactor;
-
-                Health -= magnitude * damageFactor;
-                if (Health < 0)
-                {
-                    OnDestroyed(collision);
-                }
-                else
-                {
-                    OnDamaged(collision);
-                }
+                OnDestroyed(collision);
+            }
+            else
+            {
+                OnDamaged(collision);
             }
         }
     }
