@@ -20,11 +20,15 @@ public class Damager : MonoBehaviour {
 
     void OnCollisionEnter(Collision collision)
     {
-        var destructable = collision.gameObject.GetComponent<Destructable>();
-        if (destructable != null)
+        var changeInVelocity = Vector3.Magnitude((_rigidBody.velocity - _previousVelocity));
+        if (changeInVelocity > 1)
         {
-            var force = Vector3.Magnitude((_rigidBody.velocity - _previousVelocity) / Time.fixedDeltaTime * _rigidBody.mass) * Damage;
-            destructable.InflictDamage(force, collision);
+            var destructable = collision.gameObject.GetComponent<Destructable>();
+            if (destructable != null)
+            {
+                var force = changeInVelocity / (Time.fixedDeltaTime * 10) * _rigidBody.mass * Damage;
+                destructable.InflictDamage(force, collision);
+            }
         }
     }
 

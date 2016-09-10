@@ -22,13 +22,18 @@ public class Destructable : MonoBehaviour {
     void OnCollisionEnter(Collision collision)
     {
         var changeInVelocity = Vector3.Magnitude((_rigidBody.velocity - _previousVelocity));
-        var force = changeInVelocity / Time.fixedDeltaTime * _rigidBody.mass;
-        InflictDamage(force, collision);
-
-        var destructable = collision.gameObject.GetComponent<Destructable>();
-        if (destructable != null)
+        if (changeInVelocity > 1)
         {
-            destructable.InflictDamage(force, collision);
+            var force = changeInVelocity / (Time.fixedDeltaTime * 10) * _rigidBody.mass;
+            InflictDamage(force, collision);
+
+            var destructable = collision.gameObject.GetComponent<Destructable>();
+            if (destructable != null)
+            {
+                destructable.InflictDamage(force, collision);
+            }
+
+            _previousVelocity = _rigidBody.velocity;
         }
     }
 
