@@ -5,6 +5,7 @@ using System;
 public class Destructable : MonoBehaviour {
     
     public float Health;
+    public bool DestroyMe;
 
     private Rigidbody _rigidBody;
     private Vector3 _previousVelocity;
@@ -60,6 +61,11 @@ public class Destructable : MonoBehaviour {
 
     public virtual void OnDestroyed(Collision collision)
     {
-        Destroy(gameObject);
+        if (DestroyMe)
+        {
+            Destroy(gameObject);
+        }
+        var bb = gameObject.GetComponent<BlockBehavior>();
+        bb.OnDestroyed();
     }
 }

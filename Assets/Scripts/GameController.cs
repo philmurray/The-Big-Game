@@ -4,6 +4,8 @@ using Assets.Scripts.DataStructures;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 public class GameController : MonoBehaviour
 {
@@ -34,6 +36,9 @@ public class GameController : MonoBehaviour
 
     public GamePlayer PlayerOne;
     public GamePlayer PlayerTwo;
+
+    private Stack<GamePlayer> _playerOneBackup = new Stack<GamePlayer>();
+    private Stack<GamePlayer> _playerTwoBackup = new Stack<GamePlayer>();
 
     public GamePlayer ActiveGamePlayer {
         get {
@@ -105,8 +110,31 @@ public class GameController : MonoBehaviour
                 else
                 {
                     SceneManager.LoadScene("Shooting");
+                    SaveState();
                 }
                 break;
+        }
+    }
+    private void SaveState()
+    {
+        _playerOneBackup.Push(DeepClone<GamePlayer>(PlayerOne));
+        _playerTwoBackup.Push(DeepClone<GamePlayer>(PlayerTwo));
+    }
+    private void RetrieveState()
+    {
+        PlayerOne = _playerOneBackup.Pop();
+        PlayerTwo = _playerTwoBackup.Pop();
+    }
+
+    public static T DeepClone<T>(T obj)
+    {
+        using (var ms = new MemoryStream())
+        {
+            var formatter = new BinaryFormatter();
+            formatter.Serialize(ms, obj);
+            ms.Position = 0;
+
+            return (T)formatter.Deserialize(ms);
         }
     }
 }

@@ -62,6 +62,15 @@ public abstract class BlockBehavior : MonoBehaviour {
         }
     }
 
+    public void OnDestroyed()
+    {
+        var blocksList = GameController.instance.GetPlayer(Player).Blocks;
+        if (blocksList.Contains(Block))
+        {
+            blocksList.Remove(Block);
+        }
+    }
+
     public Vector3 Size
     {
         get
