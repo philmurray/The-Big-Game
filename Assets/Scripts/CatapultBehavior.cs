@@ -9,22 +9,18 @@ public class CatapultBehavior : WeaponBehavior {
 
     public override ProjectileBehavior Fire() {
         ArmJoint.useSpring = true;
-        return base.Fire();
-    }
-
-    public override void StateUpdated()
-    {
         ArmJoint.spring = new JointSpring
         {
             damper = ArmJoint.spring.damper,
             targetPosition = ArmJoint.spring.targetPosition,
             spring = CatapultPowerConversion()
         };
-        base.StateUpdated();
+        Projectile.Activate(1);
+        return base.Fire();
     }
 
     private float CatapultPowerConversion()
     {
-        return (WeaponState.Power * (2425 * Projectile.Mass - 100)) / 100 + 400 + 975 * Projectile.Mass;
+        return (WeaponState.Power * (3.5f * Projectile.Mass)) + 400 + 975 * Projectile.Mass;
     }
 }

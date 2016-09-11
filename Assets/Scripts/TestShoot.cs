@@ -11,6 +11,7 @@ public class TestShoot : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         rb = GetComponent<Rigidbody>();
+        rb.isKinematic = true;
         vel = new Vector3(0, 0, 0);
 	}
 	
