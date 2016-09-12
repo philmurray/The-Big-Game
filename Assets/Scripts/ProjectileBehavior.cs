@@ -77,8 +77,7 @@ public class ProjectileBehavior : MonoBehaviour {
             }
 
             var damage = force * Damage;
-            destructable.InflictDamage(force, collision);
-
+            destructable.InflictDamage(damage, collision);
         }
 
         if (ExplosionForce > 0 && ExplosionActive && impact)

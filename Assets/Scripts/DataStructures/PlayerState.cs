@@ -24,9 +24,6 @@ namespace Assets.Scripts.DataStructures
             block_weight_one,
             block_weight_two,
             block_weight_three,
-            cat_size_one,
-            cat_size_two,
-            cat_size_three,
             cat_weight_one,
             cat_weight_two,
             cat_weight_three,
@@ -64,11 +61,6 @@ namespace Assets.Scripts.DataStructures
                 case Upgrade.block_weight_two:
                 case Upgrade.block_weight_three:
                     ApplyTieredUpdate(upgrade, new List<Upgrade> { Upgrade.block_weight_one, Upgrade.block_weight_two, Upgrade.block_weight_three });
-                    break;
-                case Upgrade.cat_size_one:
-                case Upgrade.cat_size_two:
-                case Upgrade.cat_size_three:
-                    ApplyTieredUpdate(upgrade, new List<Upgrade> { Upgrade.cat_size_one, Upgrade.cat_size_two, Upgrade.cat_size_three });
                     break;
                 case Upgrade.cat_weight_one:
                 case Upgrade.cat_weight_two:

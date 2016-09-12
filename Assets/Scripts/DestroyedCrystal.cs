@@ -9,14 +9,12 @@ public class DestroyedCrystal : MonoBehaviour {
     public float ExplosionRadius;
     public float ExplosionForce;
     public float ExplosionUpwardForce;
-
-    private PositionTracker _positionTracker;
+    
     private ConstantRotator _rotator;
     private float _spinStart;
 
 	// Use this for initialization
 	void Start () {
-        _positionTracker = GetComponent<PositionTracker>();
         _rotator = GetComponentInChildren<ConstantRotator>();
         _spinStart = Time.fixedTime;
 	}

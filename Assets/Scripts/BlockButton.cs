@@ -18,6 +18,7 @@ public class BlockButton : MonoBehaviour {
                 blockBehavior.Block.Orientation = BuildingSceneController.instance.DefaultOrientation[blockBehavior.Block.Type];
             }
             blockBehavior.Block.Position = new Vector3(100, 1, 100);
+            blockBehavior.Player = GameController.instance.ActivePlayer;
             blockBehavior.transform.position = blockBehavior.TransformPosition;
             blockBehavior.transform.rotation = blockBehavior.TransformRotation;
             blockBehavior.OnMouseDown();
