@@ -12,6 +12,8 @@ public abstract class WeaponBehavior : MonoBehaviour
     public Weapon WeaponState;
     public GameController.Player Player;
 
+
+    protected float PowerModifier = 1;
     protected ProjectileBehavior Projectile;
 
     public virtual ProjectileBehavior Fire() {
@@ -33,5 +35,14 @@ public abstract class WeaponBehavior : MonoBehaviour
     }
     public virtual void SetState(Weapon weaponState) {
         WeaponState = weaponState;
+    }
+
+    public void ApplyPowerUpgrades(List<AffectsWeaponPower> affectsWeaponPower)
+    {
+        PowerModifier = 1;
+        foreach (var a in affectsWeaponPower)
+        {
+            PowerModifier *= a.PowerAffect;
+        }
     }
 }

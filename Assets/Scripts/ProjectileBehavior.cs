@@ -18,17 +18,33 @@ public class ProjectileBehavior : MonoBehaviour {
     private Rigidbody _rigidBody;
     private Vector3 _previousVelocity;
 
+    private float _originalMass;
+    private float _originalDamage;
+
     public float Mass
     {
         get
         {
             return _rigidBody == null ? 0.0f : _rigidBody.mass;
         }
+        set
+        {
+            if (_rigidBody != null)
+            {
+                _rigidBody.mass = value;
+            }
+        }
     }
 
     void Start()
     {
         _rigidBody = GetComponent<Rigidbody>();
+
+        _originalDamage = Damage;
+        if (_rigidBody)
+        {
+            _originalMass = _rigidBody.mass;
+        }
 
         InitializeMass();
         InitializeDamage();
@@ -110,7 +126,7 @@ public class ProjectileBehavior : MonoBehaviour {
     {
         if (_rigidBody != null)
         {
-            float mass = _rigidBody.mass;
+            float mass = _originalMass;
             foreach (var upgradeOptions in GameController.instance.GetPlayer(Player).State.FindUpgradesWithOption("AffectsProjectileMass"))
             {
                 if (upgradeOptions["AffectsProjectileMass"].Split(' ').Contains(Weapon.Type.ToString()))
@@ -124,7 +140,7 @@ public class ProjectileBehavior : MonoBehaviour {
 
     private void InitializeDamage()
     {
-        float damage = Damage;
+        float damage = _originalDamage;
         foreach (var upgradeOptions in GameController.instance.GetPlayer(Player).State.FindUpgradesWithOption("AffectsProjectileDamage"))
         {
             if (upgradeOptions["AffectsProjectileDamage"].Split(' ').Contains(Weapon.Type.ToString()))

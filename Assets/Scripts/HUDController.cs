@@ -23,6 +23,7 @@ public class HUDController : MonoBehaviour {
     public GameObject UpgradeGameObject;
 
     public RectTransform UpgradeBox;
+    public RectTransform BlockUpgradeBox;
     public List<HUDUpgrade> Upgrades;
     private Dictionary<PlayerState.Upgrade, Sprite> _upgradesDictionary;
     private Dictionary<PlayerState.Upgrade, Sprite> UpgradesDictionary {
@@ -70,6 +71,29 @@ public class HUDController : MonoBehaviour {
             transform.anchoredPosition = new Vector3(0,bottom,0);
             transform.localScale = Vector3.one;
             bottom += transform.rect.height;
+
+            _upgradeGameObjects.Add(upgradeInstance);
+        }
+
+        bottom = 0;
+        foreach (var block in GameController.instance.ActivePlayerBlocks)
+        {
+            if (block.Type == Block.BlockType.Flag)
+            {
+                PlayerState.Upgrade upgrade = PlayerState.Upgrade.flag;
+
+                GameObject upgradeInstance = Instantiate(UpgradeGameObject);
+                Image image = upgradeInstance.GetComponent<Image>();
+                image.sprite = UpgradesDictionary[upgrade];
+
+                RectTransform transform = upgradeInstance.GetComponent<RectTransform>();
+                transform.SetParent(BlockUpgradeBox, false);
+                transform.anchoredPosition = new Vector3(0, bottom, 0);
+                transform.localScale = Vector3.one;
+                bottom += transform.rect.height;
+
+                _upgradeGameObjects.Add(upgradeInstance);
+            }
         }
     }
 }

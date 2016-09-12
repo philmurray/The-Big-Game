@@ -2,6 +2,7 @@
 using System.Collections;
 using System;
 using Assets.Scripts.DataStructures;
+using System.Collections.Generic;
 
 public class ShootingPlayerController : MonoBehaviour {
 
@@ -67,6 +68,7 @@ public class ShootingPlayerController : MonoBehaviour {
         UpdateWeapon();
     }
     public void EndAiming() {
+        ApplyModifiersToWeapon();
         AimCamera.enabled = false;
         ToggleBlocks(true);
         ToggleWeapon(false);
@@ -148,4 +150,19 @@ public class ShootingPlayerController : MonoBehaviour {
     {
         WeaponRotater.SetAngle(GameController.instance.GetPlayer(Player).Weapon.HorizontalAngle);
     }
+
+    private void ApplyModifiersToWeapon()
+    {
+        List<AffectsWeaponPower> mods = new List<AffectsWeaponPower>();
+        foreach (var mod in BlockContainer.GetComponentsInChildren<AffectsWeaponPower>())
+        {
+            var d = mod.GetComponent<Destructable>();
+            if (d == null || !d.Destroyed)
+            {
+                mods.Add(mod);
+            }
+        }
+        WeaponContainer.Weapon.ApplyPowerUpgrades(mods);
+    }
+
 }

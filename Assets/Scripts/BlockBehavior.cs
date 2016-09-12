@@ -28,22 +28,28 @@ public abstract class BlockBehavior : MonoBehaviour {
 
     public void SetModel(string name)
     {
+        var changed = false;
         if (Models.ModelsDictionary.ContainsKey(name))
         {
             Models.ModelName = name;
+            changed = true;
         }
         else if (Models.ModelsDictionary.ContainsKey(name + "_" + Player))
         {
             Models.ModelName = name + "_" + Player;
+            changed = true;
         }
-        if (TopCollider)
+        if (changed)
         {
-            Models.Model.GetComponent<BoxCollider>().enabled = false;
-        }
-        var expander = Models.Model.GetComponent<ExpanderModel>();
-        if (expander != null)
-        {
-            expander.transform.localScale = InitialSize;
+            if (TopCollider)
+            {
+                Models.Model.GetComponent<BoxCollider>().enabled = false;
+            }
+            var expander = Models.Model.GetComponent<ExpanderModel>();
+            if (expander != null)
+            {
+                expander.transform.localScale = InitialSize;
+            }
         }
     }
 

@@ -8,11 +8,13 @@ public class Destructable : MonoBehaviour {
     public bool DestroyMe;
 
     private Rigidbody _rigidBody;
+    private RealBlockBehavior _blockBehavior;
     private Vector3 _previousVelocity;
 
     public virtual void Start ()
     {
         _rigidBody = GetComponent<Rigidbody>();
+        _blockBehavior = GetComponent<RealBlockBehavior>();
     }
 
     void FixedUpdate ()
@@ -40,7 +42,7 @@ public class Destructable : MonoBehaviour {
 
     public virtual void InflictDamage(float damage, Collision collision)
     {
-        if (Health > 0)
+        if (!Destroyed)
         {
             Health -= damage;
             if (Health < 0)
@@ -56,7 +58,18 @@ public class Destructable : MonoBehaviour {
 
     public virtual void OnDamaged(Collision collision)
     {
-
+        if (_blockBehavior != null)
+        {
+            var initialHealth = _blockBehavior.InitialHealth;
+            if (Health / initialHealth < 0.33f)
+            {
+                _blockBehavior.SetModel("VeryDamaged");
+            }
+            else if (Health / initialHealth < 0.66f)
+            {
+                _blockBehavior.SetModel("Damaged");
+            }
+        }
     }
 
     public virtual void OnDestroyed(Collision collision)
@@ -65,7 +78,17 @@ public class Destructable : MonoBehaviour {
         {
             Destroy(gameObject);
         }
-        var bb = gameObject.GetComponent<BlockBehavior>();
-        bb.OnDestroyed();
+        if (_blockBehavior != null)
+        {
+            _blockBehavior.OnDestroyed();
+        }
+    }
+
+    public bool Destroyed
+    {
+        get
+        {
+            return Health < 0;
+        }
     }
 }

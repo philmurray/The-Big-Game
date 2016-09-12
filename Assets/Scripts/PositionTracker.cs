@@ -4,6 +4,7 @@ using System.Collections;
 public class PositionTracker : MonoBehaviour {
 
     public bool HasChanged;
+    public bool IgnorePosition;
 
     private Vector3 lastPosition;
 

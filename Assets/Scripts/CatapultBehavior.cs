@@ -9,6 +9,8 @@ public class CatapultBehavior : WeaponBehavior {
     public Transform BasePosition;
 
     public override ProjectileBehavior Fire() {
+        Projectile.Mass *= PowerModifier;
+
         ArmJoint.useSpring = true;
         ArmJoint.spring = new JointSpring
         {

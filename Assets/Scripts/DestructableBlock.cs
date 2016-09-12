@@ -18,19 +18,6 @@ public class DestructableBlock : Destructable {
         _rbb = GetComponent<RealBlockBehavior>();
     }
 
-    public override void OnDamaged(Collision collision)
-    {
-        var initialHealth = _rbb.InitialHealth;
-        if (Health / initialHealth < 0.33f)
-        {
-            _rbb.SetModel("VeryDamaged");
-        }
-        else if (Health / initialHealth < 0.66f)
-        {
-            _rbb.SetModel("Damaged");
-        }
-    }
-
     struct BlockUnit
     {
         public Vector3 Point;
