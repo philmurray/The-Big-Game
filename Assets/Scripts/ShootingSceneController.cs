@@ -35,12 +35,9 @@ public class ShootingSceneController : MonoBehaviour {
             return PlayersDictionary[GameController.instance.ActivePlayer];
         }
     }
-    public ShootingPlayerController OtherPlayer
+    public ShootingPlayerController OtherPlayer(GameController.Player player)
     {
-        get
-        {
-            return PlayersDictionary[GameController.instance.OtherPlayer];
-        }
+        return player == GameController.Player.One ? PlayersDictionary[GameController.Player.Two] : PlayersDictionary[GameController.Player.One];
     }
 
     [Serializable]
@@ -73,10 +70,12 @@ public class ShootingSceneController : MonoBehaviour {
     }
 
     public Camera IntroCamera;
-    public Camera ProjectileFollowCamera;
 
-    public float MaxHorizontalAngle;
-    public float HorizontalAngleSpeed;
+    public float MaxHorizontalAngleMinor;
+    public float HorizontalAngleSpeedMinor;
+
+    public float MaxHorizontalAngleMajor;
+    public float HorizontalAngleSpeedMajor;
 
     public float MaxVerticalAngle;
     public float VerticalAngleSpeed;
@@ -184,16 +183,6 @@ public class ShootingSceneController : MonoBehaviour {
         ActivePlayer.StartShooting();
     }
 
-    public void StartProjectileFollow(ProjectileBehavior projectile) {
-        ProjectileFollowCamera.enabled = true;
-        ProjectileFollowCamera.gameObject.GetComponent<FollowProjectileBehavior>().Target = projectile;
-        OtherPlayer.WaitForProjectile(projectile);
-    }
-    public void StopProjectileFollow() {
-        ProjectileFollowCamera.enabled = false;
-        ProjectileFollowCamera.gameObject.GetComponent<FollowProjectileBehavior>().Target = null;
-    }
-
     public void StopPlayerFiring()
     {
         if (GameController.instance.ActivePlayer == GameController.Player.One)
@@ -206,21 +195,41 @@ public class ShootingSceneController : MonoBehaviour {
         }
     }
 
-    public void AimLeft()
+    public void AimLeftMinor()
     {
-        GameController.instance.ActivePlayerWeapon.HorizontalAngle += HorizontalAngleSpeed;
-        if (GameController.instance.ActivePlayerWeapon.HorizontalAngle > MaxHorizontalAngle) {
-            GameController.instance.ActivePlayerWeapon.HorizontalAngle = MaxHorizontalAngle;
+        GameController.instance.ActivePlayerWeapon.MinorHorizontalAngle += HorizontalAngleSpeedMinor;
+        if (GameController.instance.ActivePlayerWeapon.MinorHorizontalAngle > MaxHorizontalAngleMinor) {
+            GameController.instance.ActivePlayerWeapon.MinorHorizontalAngle = MaxHorizontalAngleMinor;
         }
         ActivePlayer.UpdateWeapon();
     }
 
-    public void AimRight()
+    public void AimRightMinor()
     {
-        GameController.instance.ActivePlayerWeapon.HorizontalAngle -= HorizontalAngleSpeed;
-        if (GameController.instance.ActivePlayerWeapon.HorizontalAngle < -MaxHorizontalAngle)
+        GameController.instance.ActivePlayerWeapon.MinorHorizontalAngle -= HorizontalAngleSpeedMinor;
+        if (GameController.instance.ActivePlayerWeapon.MinorHorizontalAngle < -MaxHorizontalAngleMinor)
         {
-            GameController.instance.ActivePlayerWeapon.HorizontalAngle = -MaxHorizontalAngle;
+            GameController.instance.ActivePlayerWeapon.MinorHorizontalAngle = -MaxHorizontalAngleMinor;
+        }
+        ActivePlayer.UpdateWeapon();
+    }
+
+    public void AimRightMajor()
+    {
+        GameController.instance.ActivePlayerWeapon.MajorHorizontalAngle += HorizontalAngleSpeedMajor;
+        if (GameController.instance.ActivePlayerWeapon.MajorHorizontalAngle > MaxHorizontalAngleMajor)
+        {
+            GameController.instance.ActivePlayerWeapon.MajorHorizontalAngle = MaxHorizontalAngleMajor;
+        }
+        ActivePlayer.UpdateWeapon();
+    }
+
+    public void AimLeftMajor()
+    {
+        GameController.instance.ActivePlayerWeapon.MajorHorizontalAngle -= HorizontalAngleSpeedMajor;
+        if (GameController.instance.ActivePlayerWeapon.MajorHorizontalAngle < -MaxHorizontalAngleMajor)
+        {
+            GameController.instance.ActivePlayerWeapon.MajorHorizontalAngle = -MaxHorizontalAngleMajor;
         }
         ActivePlayer.UpdateWeapon();
     }

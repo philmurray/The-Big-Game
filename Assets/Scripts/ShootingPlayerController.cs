@@ -11,7 +11,8 @@ public class ShootingPlayerController : MonoBehaviour {
     public WeaponContainer WeaponContainer;
 
     public Camera AimCamera;
-    public Rotatable WeaponRotater;
+    public Rotatable WeaponRotaterMinor;
+    public Rotatable WeaponRotaterMajor;
 
     public Camera FireCamera;
     public float FireCameraWait;
@@ -20,6 +21,8 @@ public class ShootingPlayerController : MonoBehaviour {
     public Camera HitCamera;
     public Transform HitTarget;
     public float HitTargetDistance;
+
+    public Camera ProjectileFollowCamera;
     
     private ProjectileBehavior _incomingProjectile;
 
@@ -87,7 +90,7 @@ public class ShootingPlayerController : MonoBehaviour {
         yield return new WaitForSeconds(FireWait);
         var projectile = WeaponContainer.Weapon.Fire();
         yield return new WaitForSeconds(FireCameraWait);
-        ShootingSceneController.instance.StartProjectileFollow(projectile);
+        StartProjectileFollow(projectile);
         EndShooting();
     }
 
@@ -96,6 +99,19 @@ public class ShootingPlayerController : MonoBehaviour {
         FireCamera.enabled = false;
         ToggleBlocks(true);
         WeaponContainer.RemoveWeapon();
+    }
+
+
+    public void StartProjectileFollow(ProjectileBehavior projectile)
+    {
+        ProjectileFollowCamera.enabled = true;
+        ProjectileFollowCamera.gameObject.GetComponent<FollowProjectileBehavior>().Target = projectile;
+        ShootingSceneController.instance.OtherPlayer(Player).WaitForProjectile(projectile);
+    }
+    public void StopProjectileFollow()
+    {
+        ProjectileFollowCamera.enabled = false;
+        ProjectileFollowCamera.gameObject.GetComponent<FollowProjectileBehavior>().Target = null;
     }
 
     public void SelectWeapon(Weapon.WeaponType weapon)
@@ -133,7 +149,7 @@ public class ShootingPlayerController : MonoBehaviour {
 
     private void StartHitting()
     {
-        ShootingSceneController.instance.StopProjectileFollow();
+        ShootingSceneController.instance.OtherPlayer(Player).StopProjectileFollow();
         HitCamera.enabled = true;
     }
 
@@ -148,7 +164,8 @@ public class ShootingPlayerController : MonoBehaviour {
 
     public void UpdateWeapon()
     {
-        WeaponRotater.SetAngle(GameController.instance.GetPlayer(Player).Weapon.HorizontalAngle);
+        WeaponRotaterMinor.SetAngle(GameController.instance.GetPlayer(Player).Weapon.MinorHorizontalAngle);
+        WeaponRotaterMajor.SetAngle(GameController.instance.GetPlayer(Player).Weapon.MajorHorizontalAngle);
     }
 
     private void ApplyModifiersToWeapon()
