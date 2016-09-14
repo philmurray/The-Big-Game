@@ -37,8 +37,8 @@ public class GameController : MonoBehaviour
     public GamePlayer PlayerOne;
     public GamePlayer PlayerTwo;
 
-    private Stack<GamePlayer> _playerOneBackup = new Stack<GamePlayer>();
-    private Stack<GamePlayer> _playerTwoBackup = new Stack<GamePlayer>();
+    private Stack<List<Block>> _playerOneBackupBlocks = new Stack<List<Block>>();
+    private Stack<List<Block>> _playerTwoBackupBlocks = new Stack<List<Block>>();
 
     public GamePlayer ActiveGamePlayer {
         get {
@@ -117,13 +117,13 @@ public class GameController : MonoBehaviour
     }
     private void SaveState()
     {
-        _playerOneBackup.Push(DeepClone<GamePlayer>(PlayerOne));
-        _playerTwoBackup.Push(DeepClone<GamePlayer>(PlayerTwo));
+        _playerOneBackupBlocks.Push(DeepClone(PlayerOne.Blocks));
+        _playerTwoBackupBlocks.Push(DeepClone(PlayerTwo.Blocks));
     }
     private void RetrieveState()
     {
-        PlayerOne = _playerOneBackup.Pop();
-        PlayerTwo = _playerTwoBackup.Pop();
+        PlayerOne.Blocks = _playerOneBackupBlocks.Pop();
+        PlayerTwo.Blocks = _playerTwoBackupBlocks.Pop();
     }
 
     public static T DeepClone<T>(T obj)

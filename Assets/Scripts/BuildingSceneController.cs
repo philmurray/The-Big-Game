@@ -65,7 +65,9 @@ public class BuildingSceneController : MonoBehaviour {
                         GameController.instance.ActivePlayerBlocks.Add(new Block()
                         {
                             Type = Block.BlockType.Base,
-                            Position = new Vector3(x, 0, y)
+                            PositionX = x,
+                            PositionY = 0,
+                            PositionZ = y
                         });
                     }
                 }

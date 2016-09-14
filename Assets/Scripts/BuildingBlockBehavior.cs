@@ -61,7 +61,7 @@ public class BuildingBlockBehavior : BlockBehavior {
     {
         Block.Orientation = (Block.Orientation + 1) % Orientations.Count;
         transform.rotation = TransformRotation;
-        UpdatePosition(Block.Position);
+        UpdatePosition(Block.PositionX, Block.PositionY, Block.PositionZ);
         if (!isGood) {
             Rotate();
         }
@@ -101,7 +101,7 @@ public class BuildingBlockBehavior : BlockBehavior {
                     {
                         if (b.IsSupport)
                         {
-                            UpdatePosition(new Vector3(Block.Position.x, b.MaxY, Block.Position.z));
+                            UpdatePosition(Block.PositionX, b.MaxY, Block.PositionZ);
                             return;
                         }
                         else
@@ -119,7 +119,7 @@ public class BuildingBlockBehavior : BlockBehavior {
         {
             if (MinY > 0)
             {
-                UpdatePosition(new Vector3(Block.Position.x, 0, Block.Position.z));
+                UpdatePosition(Block.PositionX, 0, Block.PositionZ);
                 return;
             }
             else
@@ -141,9 +141,12 @@ public class BuildingBlockBehavior : BlockBehavior {
         }
     }
 
-    private void UpdatePosition(Vector3 pos)
+    private void UpdatePosition(int x, int y, int z)
     {
-        Block.Position = pos;
+        Block.PositionX = x;
+        Block.PositionY = y;
+        Block.PositionZ = z;
+
         transform.position = TransformPosition;
         RefreshCollisions();
     }
@@ -158,7 +161,7 @@ public class BuildingBlockBehavior : BlockBehavior {
             if (plane.Raycast(ray, out distance))
             {
                 Vector3 newPosition = ray.GetPoint(distance);
-                Vector3 gridPosition = new Vector3(Mathf.Round(newPosition.x), Block.Position.y, Mathf.Round(newPosition.z));
+                Vector3 gridPosition = new Vector3(Mathf.Round(newPosition.x), Block.PositionY, Mathf.Round(newPosition.z));
                 if (gridPosition != transform.position)
                 {
                     if (gridPosition.x < 0 ||
@@ -172,7 +175,7 @@ public class BuildingBlockBehavior : BlockBehavior {
                     }
                     else
                     {
-                        UpdatePosition(gridPosition);
+                        UpdatePosition((int)gridPosition.x, (int)gridPosition.y, (int)gridPosition.z);
                     }
                 }
             }
@@ -183,44 +186,44 @@ public class BuildingBlockBehavior : BlockBehavior {
     {
         get
         {
-            return (int)Math.Round(Block.Position.x);
+            return Block.PositionX;
         }
     }
-    private float MaxX
+    private int MaxX
     {
         get
         {
-            return (int)Math.Round(Block.Position.x + Size.x);
-        }
-    }
-
-    private float MinY
-    {
-        get
-        {
-            return (int)Math.Round(Block.Position.y);
-        }
-    }
-    private float MaxY
-    {
-        get
-        {
-            return (int)Math.Round(Block.Position.y + Size.y);
+            return (int)Math.Round(Block.PositionX + Size.x);
         }
     }
 
-    private float MinZ
+    private int MinY
     {
         get
         {
-            return (int)Math.Round(Block.Position.z);
+            return Block.PositionY;
         }
     }
-    private float MaxZ
+    private int MaxY
     {
         get
         {
-            return (int)Math.Round(Block.Position.z + Size.z);
+            return (int)Math.Round(Block.PositionY + Size.y);
+        }
+    }
+
+    private int MinZ
+    {
+        get
+        {
+            return Block.PositionZ;
+        }
+    }
+    private int MaxZ
+    {
+        get
+        {
+            return (int)Math.Round(Block.PositionZ + Size.z);
         }
     }
 }

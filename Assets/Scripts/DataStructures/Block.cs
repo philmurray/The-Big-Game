@@ -24,10 +24,12 @@ namespace Assets.Scripts.DataStructures
         public BlockType Type;
 
         #region tranform
+        
+        public int PositionX;
+        public int PositionY;
+        public int PositionZ;
 
-        public Vector3 Position;
         public int Orientation;
-
         
 
         #endregion

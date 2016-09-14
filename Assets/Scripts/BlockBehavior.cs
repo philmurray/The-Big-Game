@@ -57,7 +57,7 @@ public abstract class BlockBehavior : MonoBehaviour {
     {
         get
         {
-            return Block.Position + (Size - Vector3.one) / 2;
+            return new Vector3(Block.PositionX, Block.PositionY, Block.PositionZ) + (Size - Vector3.one) / 2;
         }
     }
     public Quaternion TransformRotation
