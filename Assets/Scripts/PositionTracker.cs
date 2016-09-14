@@ -6,15 +6,12 @@ public class PositionTracker : MonoBehaviour {
     public bool HasChanged;
     public bool IgnorePosition;
 
-    private Vector3 lastPosition;
-
-    void Start() {
-        lastPosition = transform.position;
-    }
-
 	// Update is called once per frame
 	void FixedUpdate () {
-        HasChanged = lastPosition != transform.position;
-        lastPosition = transform.position;
+        if (!IgnorePosition)
+        {
+            HasChanged = transform.hasChanged;
+            transform.hasChanged = false;
+        }
 	}
 }

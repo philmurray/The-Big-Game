@@ -27,7 +27,7 @@ public class DestroyedCrystal : MonoBehaviour {
         }
         else
         {
-            Instantiate(Explosion, transform.position, transform.rotation, transform.parent);
+            var explosion = Instantiate(Explosion, transform.position, transform.rotation, transform.parent);
 
             Collider[] colliders = Physics.OverlapSphere(transform.position, ExplosionRadius);
             foreach (Collider hit in colliders)
@@ -44,10 +44,12 @@ public class DestroyedCrystal : MonoBehaviour {
                 }
             }
 
-            Destroy(gameObject);
+            Destroy(gameObject, 0.01f);
+            Destroy(explosion, 2);
+
             foreach (Transform t in transform)
             {
-                Destroy(t.gameObject);
+                Destroy(t.gameObject, 0.01f);
             }
         }
 	}

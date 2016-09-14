@@ -23,6 +23,15 @@ public class RealBlockBehavior : BlockBehavior {
         InitializeHealth();
     }
 
+    void FixedUpdate()
+    {
+        if (transform.position.y < -10)
+        {
+            Destroy(gameObject);
+            OnDestroyed();
+        }
+    }
+
     public float Health
     {
         get

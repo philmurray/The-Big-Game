@@ -18,9 +18,12 @@ public class ShootingPlayerController : MonoBehaviour {
     public float FireCameraWait;
     public float FireWait;
 
-    public Camera HitCamera;
+    public HitCameraBehavior HitCamera;
     public Transform HitTarget;
     public float HitTargetDistance;
+    public float CrystalZoomSpeed;
+    public float ResolutionTime;
+    private float _resolutionStartTime;
 
     public Camera ProjectileFollowCamera;
     
@@ -32,7 +35,7 @@ public class ShootingPlayerController : MonoBehaviour {
 
     void FixedUpdate() {
         if (_incomingProjectile != null) {
-            if (!HitCamera.enabled)
+            if (!HitCamera.CameraEnabled)
             {
                 var distance = Vector3.Distance(HitTarget.position, _incomingProjectile.transform.position);
                 if (distance < HitTargetDistance)
@@ -40,19 +43,9 @@ public class ShootingPlayerController : MonoBehaviour {
                     StartHitting();
                 }
             }
-            var hasChanged = _incomingProjectile.GetComponent<PositionTracker>().HasChanged;
-            if (!hasChanged) {
-
-                foreach (var pt in BlockContainer.GetComponentsInChildren<PositionTracker>()) {
-                    if (pt.HasChanged) {
-                        hasChanged = true;
-                        break;
-                    }
-                }
-            }
-            if (!hasChanged)
+            else
             {
-                StopHitting();
+                WaitForResolution();
             }
         }
     }
@@ -145,21 +138,52 @@ public class ShootingPlayerController : MonoBehaviour {
     public void WaitForProjectile(ProjectileBehavior projectile)
     {
         _incomingProjectile = projectile;
+        _incomingProjectile.transform.SetParent(BlockContainer.transform);
     }
 
     private void StartHitting()
     {
         ShootingSceneController.instance.OtherPlayer(Player).StopProjectileFollow();
-        HitCamera.enabled = true;
+        HitCamera.CameraEnabled = true;
+        _resolutionStartTime = Time.fixedTime;
+    }
+
+    private void WaitForResolution()
+    {
+        if (Time.fixedTime - _resolutionStartTime > ResolutionTime)
+        {
+            StopHitting();
+            return;
+        }
+
+        var hasChanged = false;
+        foreach (var pt in BlockContainer.GetComponentsInChildren<PositionTracker>())
+        {
+            if (pt.HasChanged)
+            {
+                hasChanged = true;
+                break;
+            }
+        }
+        var destroyedCrystal = BlockContainer.GetComponentInChildren<DestroyedCrystal>();
+        if (destroyedCrystal != null)
+        {
+            HitCamera.FocusOn(destroyedCrystal.transform);
+            hasChanged = true;
+        }
+
+        if (!hasChanged)
+        {
+            StopHitting();
+        }
     }
 
     private void StopHitting()
     {
         ShootingSceneController.instance.StopPlayerFiring();
-        _incomingProjectile.transform.SetParent(BlockContainer.transform);
         _incomingProjectile = null;
-        HitCamera.GetComponent<HitCameraBehavior>().Reset();
-        HitCamera.enabled = false;
+        HitCamera.Reset();
+        HitCamera.CameraEnabled = false;
     }
 
     public void UpdateWeapon()
