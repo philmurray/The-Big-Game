@@ -32,6 +32,7 @@ public class GameController : MonoBehaviour
         public PlayerState State;
         public List<Block> Blocks;
         public Weapon Weapon;
+        public int Score;
     }
 
     public GamePlayer PlayerOne;

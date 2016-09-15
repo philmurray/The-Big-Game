@@ -70,6 +70,7 @@ public class ShootingSceneController : MonoBehaviour {
     }
 
     public Camera IntroCamera;
+    public Camera ExtroCamera;
 
     public float MaxHorizontalAngleMinor;
     public float HorizontalAngleSpeedMinor;
@@ -82,6 +83,8 @@ public class ShootingSceneController : MonoBehaviour {
 
     public float PowerSpeed;
     public Text PowerText;
+
+    public RoundOverModalBehavior RoundOverModal;
 
     void Start()
     {
@@ -191,8 +194,48 @@ public class ShootingSceneController : MonoBehaviour {
         }
         else
         {
-            StartAim();
+            bool p1 = GameController.instance.PlayerOne.Blocks.Exists(b => b.Type == Block.BlockType.Crystal);
+            bool p2 = GameController.instance.PlayerTwo.Blocks.Exists(b => b.Type == Block.BlockType.Crystal);
+
+            if (!p1 || !p2)
+            {
+                EndRound(p1, p2);
+            }
+            else
+            {
+                StartAim();
+            }
         }
+    }
+
+    public void EndRound(bool playerOneWins, bool playerTwoWins)
+    {
+        State = States.Summary;
+        ExtroCamera.enabled = true;
+
+        GameController.instance.PlayerOne.Score += playerOneWins ? 1 : 0;
+        GameController.instance.PlayerTwo.Score += playerTwoWins ? 1 : 0;
+
+        if (playerOneWins)
+        {
+            if (playerTwoWins)
+            {
+                RoundOverModal.ShowTie();
+            }
+            else
+            {
+                RoundOverModal.ShowWinner(GameController.Player.One);
+            }
+        }
+        else
+        {
+            RoundOverModal.ShowWinner(GameController.Player.Two);
+        }
+    }
+
+    public void NextRound(bool gameOver)
+    {
+        throw new NotImplementedException();
     }
 
     public void AimLeftMinor()
