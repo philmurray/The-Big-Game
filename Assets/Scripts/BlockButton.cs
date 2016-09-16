@@ -1,17 +1,21 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Assets.Scripts.DataStructures;
+using UnityEngine.UI;
 
 public class BlockButton : MonoBehaviour {
 
-    public GameObject Block;
-    public Transform Parent;
+    public Block.BlockType BlockType;
+    public BlockContainer Parent;
+    public Text AvailableText;
 
     private GameObject DraggingBlock;
     public void StartDrag() {
-        if (BuildingSceneController.instance.AvailableBlocks(Block.GetComponent<BuildingBlockBehavior>().Block.Type) > 0)
+        if (GameController.instance.ActivePlayerState.GetAvailableBlocks(BlockType) > 0)
         {
-            DraggingBlock = Instantiate(Block) as GameObject;
-            DraggingBlock.transform.SetParent(Parent);
+            DraggingBlock = Instantiate(Parent.BlockObjectsDictionary[BlockType]) as GameObject;
+            DraggingBlock.transform.SetParent(Parent.transform);
+
             var blockBehavior = DraggingBlock.GetComponent<BuildingBlockBehavior>();
 
             if (BuildingSceneController.instance.DefaultOrientation.ContainsKey(blockBehavior.Block.Type)) {
@@ -33,5 +37,9 @@ public class BlockButton : MonoBehaviour {
             DraggingBlock.GetComponent<BuildingBlockBehavior>().OnMouseUp();
             DraggingBlock = null;
         }
+    }
+    public void RefreshAvailable()
+    {
+        AvailableText.text = GameController.instance.ActivePlayerState.GetAvailableBlocks(BlockType).ToString();
     }
 }

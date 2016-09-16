@@ -72,6 +72,8 @@ public class ShootingSceneController : MonoBehaviour {
     public Camera IntroCamera;
     public Camera ExtroCamera;
 
+    public GameObject HUD;
+
     public float MaxHorizontalAngleMinor;
     public float HorizontalAngleSpeedMinor;
 
@@ -88,7 +90,7 @@ public class ShootingSceneController : MonoBehaviour {
 
     void Start()
     {
-        HUDController.instance.gameObject.SetActive(false);
+        HUD.SetActive(false);
 
         PlayersList.ForEach(p => p.StartTargeted());
 
@@ -118,13 +120,13 @@ public class ShootingSceneController : MonoBehaviour {
     public void StartAim() {
         State = States.Aiming;
         StartPlayerAim(GameController.Player.One);
-        HUDController.instance.gameObject.SetActive(true);
+        HUD.SetActive(true);
     }
 
     private void StartPlayerAim(GameController.Player player) {
         GameController.instance.ActivePlayer = player;
         ActivePlayer.StartAiming();
-        HUDController.instance.Refresh();
+        HUD.GetComponentInChildren<UpgradesContainer>().Refresh();
         SelectWeaponMenu(GameController.instance.ActivePlayerWeapon.Type);
     }
 
@@ -176,7 +178,7 @@ public class ShootingSceneController : MonoBehaviour {
     public void StartFiring()
     {
         State = States.Firing;
-        HUDController.instance.gameObject.SetActive(false);
+        HUD.SetActive(false);
         StartPlayerFiring(GameController.Player.One);
     }
 

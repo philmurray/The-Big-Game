@@ -21,6 +21,8 @@ public class BuildingSceneController : MonoBehaviour {
     public BlockContainer BlockContainer;
     public BlockContainer RealBlockContainer;
 
+    public GameObject HUD;
+
     public GameObject SelectionMenu;
     public GameObject RotateButton;
     public GameObject ReadyButton;
@@ -75,14 +77,11 @@ public class BuildingSceneController : MonoBehaviour {
                     }
                 }
             }
-            else if (GameController.instance.ActivePlayerBlocks.Exists(b => b.Type == Block.BlockType.Crystal))
-            {
-                ReadyButton.SetActive(true);
-            }
+
             BlockContainer.SetBlocks();
+            UpdateButtons();
 
             Destroy(GameObject.FindGameObjectWithTag("Modal"));
-            HUDController.instance.gameObject.SetActive(true);
         }
     }
 
@@ -90,13 +89,11 @@ public class BuildingSceneController : MonoBehaviour {
     {
         BlockContainer.Player = GameController.instance.ActivePlayer;
         RealBlockContainer.Player = GameController.instance.ActivePlayer;
-        HUDController.instance.gameObject.SetActive(false);
     }
 
     public void ReadyButtonClick()
     {
         State = States.Testing;
-        HUDController.instance.gameObject.SetActive(false);
         BlockContainer.gameObject.SetActive(false);
         foreach (var child in BlockContainer.gameObject.transform)
         {
@@ -121,7 +118,6 @@ public class BuildingSceneController : MonoBehaviour {
         }
 
         State = States.Playing;
-        HUDController.instance.gameObject.SetActive(true);
         BlockContainer.gameObject.SetActive(true);
         RetryButton.SetActive(false);
         foreach (var child in BlockContainer.gameObject.transform)
@@ -163,92 +159,28 @@ public class BuildingSceneController : MonoBehaviour {
         }
     }
 
-    public int AvailableBlocks(Block.BlockType block)
-    {
-        switch (block)
-        {
-            case Block.BlockType.Small:
-                return GameController.instance.ActivePlayerState.AvailableSmallBlocks;
-            case Block.BlockType.Medium:
-                return GameController.instance.ActivePlayerState.AvailableMediumBlocks;
-            case Block.BlockType.Large:
-                return GameController.instance.ActivePlayerState.AvailableLargeBlocks;
-            case Block.BlockType.Huge:
-                return GameController.instance.ActivePlayerState.AvailableHugeBlocks;
-            case Block.BlockType.Flag:
-                return GameController.instance.ActivePlayerState.AvailableFlags;
-            case Block.BlockType.Crystal:
-                return GameController.instance.ActivePlayerState.AvailableCrystals;
-            default:
-                return 0;
-        }
-    }
-
     public void PlaceBlock(Block block)
     {
         GameController.instance.ActivePlayerBlocks.Add(block);
-        switch (block.Type)
-        {
-            case Block.BlockType.Small:
-                GameController.instance.ActivePlayerState.AvailableSmallBlocks--;
-                break;
-            case Block.BlockType.Medium:
-                GameController.instance.ActivePlayerState.AvailableMediumBlocks--;
-                break;
-            case Block.BlockType.Large:
-                GameController.instance.ActivePlayerState.AvailableLargeBlocks--;
-                break;
-            case Block.BlockType.Huge:
-                GameController.instance.ActivePlayerState.AvailableHugeBlocks--;
-                break;
-            case Block.BlockType.Flag:
-                GameController.instance.ActivePlayerState.AvailableFlags--;
-                break;
-            case Block.BlockType.Crystal:
-                GameController.instance.ActivePlayerState.AvailableCrystals--;
-                ReadyButton.SetActive(true);
-                break;
-            default:
-                break;
-        }
-
-        HUDController.instance.Refresh();
+        GameController.instance.ActivePlayerState.AddAvailableBlocks(block.Type, -1);
+        UpdateButtons();
     }
 
+    public void UpdateButtons()
+    {
+        ReadyButton.SetActive(GameController.instance.ActivePlayerBlocks.Exists(b => b.Type == Block.BlockType.Crystal));
+        foreach (var button in HUD.GetComponentsInChildren<BlockButton>())
+        {
+            button.RefreshAvailable();
+        }
+    }
     public void RemoveBlock(Block block)
     {
         if (GameController.instance.ActivePlayerBlocks.Contains(block))
         {
             GameController.instance.ActivePlayerBlocks.Remove(block);
-            switch (block.Type)
-            {
-                case Block.BlockType.Small:
-                    GameController.instance.ActivePlayerState.AvailableSmallBlocks++;
-                    break;
-                case Block.BlockType.Medium:
-                    GameController.instance.ActivePlayerState.AvailableMediumBlocks++;
-                    break;
-                case Block.BlockType.Large:
-                    GameController.instance.ActivePlayerState.AvailableLargeBlocks++;
-                    break;
-                case Block.BlockType.Huge:
-                    GameController.instance.ActivePlayerState.AvailableHugeBlocks++;
-                    break;
-                case Block.BlockType.Flag:
-                    GameController.instance.ActivePlayerState.AvailableFlags++;
-                    break;
-                case Block.BlockType.Crystal:
-                    GameController.instance.ActivePlayerState.AvailableCrystals++;
-                    if (!GameController.instance.ActivePlayerBlocks.Exists(b => b.Type == Block.BlockType.Crystal))
-                    {
-                        ReadyButton.SetActive(false);
-                    }
-                    break;
-                default:
-                    break;
-            }
-
-            HUDController.instance.Refresh();
+            GameController.instance.ActivePlayerState.AddAvailableBlocks(block.Type, 1);
+            UpdateButtons();
         }
     }
 

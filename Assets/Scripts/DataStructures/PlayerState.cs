@@ -8,12 +8,28 @@ namespace Assets.Scripts.DataStructures
     [Serializable]
     public class PlayerState
     {
-        public int AvailableSmallBlocks;
-        public int AvailableMediumBlocks;
-        public int AvailableLargeBlocks;
-        public int AvailableHugeBlocks;
-        public int AvailableFlags;
-        public int AvailableCrystals;
+        [Serializable]
+        public class AvailableBlock
+        {
+            public Block.BlockType BlockType;
+            public int NumberAvailable;
+        }
+
+        public List<AvailableBlock> AvailableBlocksList;
+
+        private Dictionary<Block.BlockType, int> _availableBlocks;
+        public Dictionary<Block.BlockType, int> AvailableBlocks
+        {
+            get
+            {
+                if (_availableBlocks == null)
+                {
+                    _availableBlocks = new Dictionary<Block.BlockType, int>();
+                    AvailableBlocksList.ForEach(p => _availableBlocks.Add(p.BlockType, p.NumberAvailable));
+                }
+                return _availableBlocks;
+            }
+        }
 
         public List<Upgrade> Upgrades;
 
@@ -78,24 +94,37 @@ namespace Assets.Scripts.DataStructures
                     ApplyTieredUpdate(upgrade, new List<Upgrade> { Upgrade.flag_one, Upgrade.flag_two, Upgrade.flag_three });
                     break;
                 case Upgrade.block_small:
-                    AvailableSmallBlocks++;
+                    AddAvailableBlocks(Block.BlockType.Small, 1);
                     break;
                 case Upgrade.block_medium:
-                    AvailableMediumBlocks++;
+                    AddAvailableBlocks(Block.BlockType.Medium, 1);
                     break;
                 case Upgrade.block_large:
-                    AvailableLargeBlocks++;
+                    AddAvailableBlocks(Block.BlockType.Large, 1);
                     break;
                 case Upgrade.block_huge:
-                    AvailableHugeBlocks++;
+                    AddAvailableBlocks(Block.BlockType.Huge, 1);
                     break;
                 case Upgrade.flag:
-                    AvailableFlags++;
+                    AddAvailableBlocks(Block.BlockType.Flag, 1);
                     break;
                 case Upgrade.crystal:
-                    AvailableCrystals++;
+                    AddAvailableBlocks(Block.BlockType.Crystal, 1);
                     break;
             }
+        }
+
+        public void AddAvailableBlocks(Block.BlockType type, int num)
+        {
+            int avail;
+            AvailableBlocks.TryGetValue(type, out avail);
+            AvailableBlocks[type] = avail + num;
+        }
+        public int GetAvailableBlocks(Block.BlockType type)
+        {
+            int avail;
+            AvailableBlocks.TryGetValue(type, out avail);
+            return avail;
         }
 
         private void ApplyTieredUpdate(Upgrade upgrade, List<Upgrade> list)

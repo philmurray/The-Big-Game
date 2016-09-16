@@ -42,7 +42,7 @@ public abstract class WeaponBehavior : MonoBehaviour
         PowerModifier = 1;
         foreach (var a in affectsWeaponPower)
         {
-            PowerModifier *= a.PowerAffect;
+            PowerModifier += a.PowerAffect;
         }
     }
 }

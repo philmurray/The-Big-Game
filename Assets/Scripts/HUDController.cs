@@ -50,12 +50,12 @@ public class HUDController : MonoBehaviour {
 	}
 
     public void Refresh() {
-        SmallBlockCount.text = GameController.instance.ActivePlayerState.AvailableSmallBlocks.ToString();
-        MediumBlockCount.text = GameController.instance.ActivePlayerState.AvailableMediumBlocks.ToString();
-        LargeBlockCount.text = GameController.instance.ActivePlayerState.AvailableLargeBlocks.ToString();
-        HugeBlockCount.text = GameController.instance.ActivePlayerState.AvailableHugeBlocks.ToString();
-        FlagCount.text = GameController.instance.ActivePlayerState.AvailableFlags.ToString();
-        CrystalCount.text = GameController.instance.ActivePlayerState.AvailableCrystals.ToString();
+        SmallBlockCount.text = GameController.instance.ActivePlayerState.GetAvailableBlocks(Block.BlockType.Small).ToString();
+        MediumBlockCount.text = GameController.instance.ActivePlayerState.GetAvailableBlocks(Block.BlockType.Medium).ToString();
+        LargeBlockCount.text = GameController.instance.ActivePlayerState.GetAvailableBlocks(Block.BlockType.Large).ToString();
+        HugeBlockCount.text = GameController.instance.ActivePlayerState.GetAvailableBlocks(Block.BlockType.Huge).ToString();
+        FlagCount.text = GameController.instance.ActivePlayerState.GetAvailableBlocks(Block.BlockType.Flag).ToString();
+        CrystalCount.text = GameController.instance.ActivePlayerState.GetAvailableBlocks(Block.BlockType.Crystal).ToString();
 
         _upgradeGameObjects.ForEach(o => Destroy(o));
         AddUpgrades(UpgradeBox, GameController.instance.ActivePlayerState.Upgrades);
