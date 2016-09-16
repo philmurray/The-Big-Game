@@ -59,9 +59,12 @@ public class BuildingSceneController : MonoBehaviour {
         {
             State = States.Playing;
 
-            if (GameController.instance.ActivePlayerBlocks.Count == 0) {
-                for (int x = 0; x < BaseX; x++) {
-                    for (int y = 0; y < BaseY; y++) {
+            if (GameController.instance.ActivePlayerBlocks.Count == 0)
+            {
+                for (int x = 0; x < BaseX; x++)
+                {
+                    for (int y = 0; y < BaseY; y++)
+                    {
                         GameController.instance.ActivePlayerBlocks.Add(new Block()
                         {
                             Type = Block.BlockType.Base,
@@ -71,8 +74,13 @@ public class BuildingSceneController : MonoBehaviour {
                         });
                     }
                 }
-                BlockContainer.SetBlocks();
             }
+            else if (GameController.instance.ActivePlayerBlocks.Exists(b => b.Type == Block.BlockType.Crystal))
+            {
+                ReadyButton.SetActive(true);
+            }
+            BlockContainer.SetBlocks();
+
             Destroy(GameObject.FindGameObjectWithTag("Modal"));
             HUDController.instance.gameObject.SetActive(true);
         }

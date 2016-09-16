@@ -213,13 +213,12 @@ public class ShootingSceneController : MonoBehaviour {
         State = States.Summary;
         ExtroCamera.enabled = true;
 
-        GameController.instance.PlayerOne.Score += playerOneWins ? 1 : 0;
-        GameController.instance.PlayerTwo.Score += playerTwoWins ? 1 : 0;
-
         if (playerOneWins)
         {
+            GameController.instance.AddScore(GameController.Player.One);
             if (playerTwoWins)
             {
+                GameController.instance.AddScore(GameController.Player.Two);
                 RoundOverModal.ShowTie();
             }
             else
@@ -229,13 +228,9 @@ public class ShootingSceneController : MonoBehaviour {
         }
         else
         {
+            GameController.instance.AddScore(GameController.Player.Two);
             RoundOverModal.ShowWinner(GameController.Player.Two);
         }
-    }
-
-    public void NextRound(bool gameOver)
-    {
-        throw new NotImplementedException();
     }
 
     public void AimLeftMinor()

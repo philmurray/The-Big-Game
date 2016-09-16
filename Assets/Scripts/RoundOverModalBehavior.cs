@@ -16,7 +16,7 @@ public class RoundOverModalBehavior : MonoBehaviour {
     {
         get
         {
-            return GameController.instance.GetPlayer(_winner).Score >= PlayerOnePanels.Count;
+            return GameController.instance.GetPlayer(_winner).Winner;
         }
     }
 
@@ -71,6 +71,6 @@ public class RoundOverModalBehavior : MonoBehaviour {
 
     public void NextRound()
     {
-        ShootingSceneController.instance.NextRound(GameOver);
+        GameController.instance.NextScene();
     }
 }

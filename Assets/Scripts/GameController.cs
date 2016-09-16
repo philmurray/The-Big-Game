@@ -32,6 +32,8 @@ public class GameController : MonoBehaviour
         public PlayerState State;
         public List<Block> Blocks;
         public Weapon Weapon;
+
+        public bool Winner;
         public int Score;
     }
 
@@ -40,6 +42,9 @@ public class GameController : MonoBehaviour
 
     private Stack<List<Block>> _playerOneBackupBlocks = new Stack<List<Block>>();
     private Stack<List<Block>> _playerTwoBackupBlocks = new Stack<List<Block>>();
+
+    private Stack<GamePlayer> _playerOneBackup = new Stack<GamePlayer>();
+    private Stack<GamePlayer> _playerTwoBackup = new Stack<GamePlayer>();
 
     public GamePlayer ActiveGamePlayer {
         get {
@@ -89,6 +94,17 @@ public class GameController : MonoBehaviour
         }
     }
 
+    public int ScoreToWin;
+    public void AddScore(Player player)
+    {
+        var p = GetPlayer(player);
+        p.Score++;
+        if (p.Score >= ScoreToWin)
+        {
+            p.Winner = true;
+        }
+    }
+
     public void NextScene() {
         NextScene(false);
     }
@@ -97,6 +113,7 @@ public class GameController : MonoBehaviour
         switch (SceneManager.GetActiveScene().name)
         {
             case "MainMenu":
+                SaveState();
                 SceneManager.LoadScene("Upgrades");
                 break;
             case "Upgrades":
@@ -111,20 +128,43 @@ public class GameController : MonoBehaviour
                 else
                 {
                     SceneManager.LoadScene("Shooting");
-                    SaveState();
+                    SaveBlockState();
+                }
+                break;
+            case "Shooting":
+                ActivePlayer = Player.One;
+                if (PlayerOne.Winner || PlayerTwo.Winner)
+                {
+                    RetrieveState();
+                    SceneManager.LoadScene("MainMenu");
+                }
+                else
+                {
+                    RetrieveBlockState();
+                    SceneManager.LoadScene("Building");
                 }
                 break;
         }
     }
-    private void SaveState()
+    private void SaveBlockState()
     {
         _playerOneBackupBlocks.Push(DeepClone(PlayerOne.Blocks));
         _playerTwoBackupBlocks.Push(DeepClone(PlayerTwo.Blocks));
     }
-    private void RetrieveState()
+    private void RetrieveBlockState()
     {
         PlayerOne.Blocks = _playerOneBackupBlocks.Pop();
         PlayerTwo.Blocks = _playerTwoBackupBlocks.Pop();
+    }
+    private void SaveState()
+    {
+        _playerOneBackup.Push(DeepClone(PlayerOne));
+        _playerTwoBackup.Push(DeepClone(PlayerTwo));
+    }
+    private void RetrieveState()
+    {
+        PlayerOne = _playerOneBackup.Pop();
+        PlayerTwo= _playerTwoBackup.Pop();
     }
 
     public static T DeepClone<T>(T obj)
