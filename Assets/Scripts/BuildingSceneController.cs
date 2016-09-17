@@ -2,6 +2,7 @@
 using System.Collections;
 using Assets.Scripts.DataStructures;
 using System.Collections.Generic;
+using System;
 
 public class BuildingSceneController : MonoBehaviour {
 
@@ -11,8 +12,6 @@ public class BuildingSceneController : MonoBehaviour {
     {
         instance = this;
     }
-    public enum States { Intro, Playing, Testing };
-    public States State = States.Intro;
 
     public int BaseX;
     public int BaseY;
@@ -21,12 +20,16 @@ public class BuildingSceneController : MonoBehaviour {
     public BlockContainer BlockContainer;
     public BlockContainer RealBlockContainer;
 
+    public UpgradesContainer UpgradesContainer;
+
     public GameObject HUD;
 
     public GameObject SelectionMenu;
     public GameObject RotateButton;
     public GameObject ReadyButton;
     public GameObject RetryButton;
+
+    public ShopModal ShopModal;
 
     public Dictionary<Block.BlockType, int> DefaultOrientation = new Dictionary<Block.BlockType, int>();
 
@@ -55,46 +58,57 @@ public class BuildingSceneController : MonoBehaviour {
         }
     }
 
-    public void Play()
+    private void Setup()
     {
-        if (State == States.Intro)
+        if (GameController.instance.ActivePlayerBlocks.Count == 0)
         {
-            State = States.Playing;
-
-            if (GameController.instance.ActivePlayerBlocks.Count == 0)
+            for (int x = 0; x < BaseX; x++)
             {
-                for (int x = 0; x < BaseX; x++)
+                for (int y = 0; y < BaseY; y++)
                 {
-                    for (int y = 0; y < BaseY; y++)
+                    GameController.instance.ActivePlayerBlocks.Add(new Block()
                     {
-                        GameController.instance.ActivePlayerBlocks.Add(new Block()
-                        {
-                            Type = Block.BlockType.Base,
-                            PositionX = x,
-                            PositionY = 0,
-                            PositionZ = y
-                        });
-                    }
+                        Type = Block.BlockType.Base,
+                        PositionX = x,
+                        PositionY = 0,
+                        PositionZ = y
+                    });
                 }
             }
-
-            BlockContainer.SetBlocks();
-            UpdateButtons();
-
-            Destroy(GameObject.FindGameObjectWithTag("Modal"));
         }
+
+        BlockContainer.SetBlocks();
+        UpdateButtons();
     }
 
     void Start()
     {
         BlockContainer.Player = GameController.instance.ActivePlayer;
         RealBlockContainer.Player = GameController.instance.ActivePlayer;
+
+        Setup();
+        ShowShop();
     }
+
+    public void ShowShop()
+    {
+        ShopModal.gameObject.SetActive(true);
+        ShopModal.Refresh();
+        HUD.SetActive(false);
+    }
+
+    public void HideShop()
+    {
+        ShopModal.gameObject.SetActive(false);
+        HUD.SetActive(true);
+        UpdateButtons();
+    }
+
 
     public void ReadyButtonClick()
     {
-        State = States.Testing;
         BlockContainer.gameObject.SetActive(false);
+        HUD.SetActive(false);
         foreach (var child in BlockContainer.gameObject.transform)
         {
             var go = child as GameObject;
@@ -116,10 +130,10 @@ public class BuildingSceneController : MonoBehaviour {
         {
             Destroy(((Transform)child).gameObject);
         }
-
-        State = States.Playing;
+        
         BlockContainer.gameObject.SetActive(true);
         RetryButton.SetActive(false);
+        HUD.SetActive(true);
         foreach (var child in BlockContainer.gameObject.transform)
         {
             var go = child as GameObject;
@@ -168,6 +182,7 @@ public class BuildingSceneController : MonoBehaviour {
 
     public void UpdateButtons()
     {
+        UpgradesContainer.Refresh();
         ReadyButton.SetActive(GameController.instance.ActivePlayerBlocks.Exists(b => b.Type == Block.BlockType.Crystal));
         foreach (var button in HUD.GetComponentsInChildren<BlockButton>())
         {
@@ -182,6 +197,18 @@ public class BuildingSceneController : MonoBehaviour {
             GameController.instance.ActivePlayerState.AddAvailableBlocks(block.Type, 1);
             UpdateButtons();
         }
+    }
+    public void RemoveAllBlocks()
+    {
+        foreach (var block in GameController.instance.ActivePlayerBlocks)
+        {
+            if (block.Type != Block.BlockType.Base)
+            {
+                GameController.instance.ActivePlayerBlocks.Remove(block);
+                GameController.instance.ActivePlayerState.AddAvailableBlocks(block.Type, 1);
+            }
+        }
+        UpdateButtons();
     }
 
     public void DeleteSelected() {

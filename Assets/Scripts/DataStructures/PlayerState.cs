@@ -8,6 +8,8 @@ namespace Assets.Scripts.DataStructures
     [Serializable]
     public class PlayerState
     {
+        public int Gold;
+
         [Serializable]
         public class AvailableBlock
         {
@@ -120,6 +122,12 @@ namespace Assets.Scripts.DataStructures
             AvailableBlocks.TryGetValue(type, out avail);
             AvailableBlocks[type] = avail + num;
         }
+        public void RemoveAvailableBlocks(Block.BlockType type, int num)
+        {
+            int avail;
+            AvailableBlocks.TryGetValue(type, out avail);
+            AvailableBlocks[type] = avail - num;
+        }
         public int GetAvailableBlocks(Block.BlockType type)
         {
             int avail;
@@ -139,6 +147,34 @@ namespace Assets.Scripts.DataStructures
                 Upgrades.Remove(existingUpgrade);
                 int index = Math.Min(list.IndexOf(upgrade) + list.IndexOf(existingUpgrade) + 1, list.Count - 1);
                 Upgrades.Add(list[index]);
+            }
+        }
+
+        internal void RemoveUpgrade(Upgrade upgrade)
+        {
+            switch (upgrade)
+            {
+                case Upgrade.block_small:
+                    RemoveAvailableBlocks(Block.BlockType.Small, 1);
+                    break;
+                case Upgrade.block_medium:
+                    RemoveAvailableBlocks(Block.BlockType.Medium, 1);
+                    break;
+                case Upgrade.block_large:
+                    RemoveAvailableBlocks(Block.BlockType.Large, 1);
+                    break;
+                case Upgrade.block_huge:
+                    RemoveAvailableBlocks(Block.BlockType.Huge, 1);
+                    break;
+                case Upgrade.flag:
+                    RemoveAvailableBlocks(Block.BlockType.Flag, 1);
+                    break;
+                case Upgrade.crystal:
+                    RemoveAvailableBlocks(Block.BlockType.Crystal, 1);
+                    break;
+                default:
+                    Upgrades.Remove(upgrade);
+                    break;
             }
         }
     }
