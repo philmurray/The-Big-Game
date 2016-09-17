@@ -11,7 +11,6 @@ public class BlockButton : MonoBehaviour {
 
     private GameObject DraggingBlock;
     public void StartDrag() {
-        Debug.Log("Start the Dragon");
         if (GameController.instance.ActivePlayerState.GetAvailableBlocks(BlockType) > 0)
         {
             DraggingBlock = Instantiate(Parent.BlockObjectsDictionary[BlockType]) as GameObject;
@@ -34,7 +33,6 @@ public class BlockButton : MonoBehaviour {
     }
     public void EndDrag()
     {
-        Debug.Log("End the Dragon");
         if (DraggingBlock != null) {
             DraggingBlock.GetComponent<BuildingBlockBehavior>().OnMouseUp();
             DraggingBlock = null;

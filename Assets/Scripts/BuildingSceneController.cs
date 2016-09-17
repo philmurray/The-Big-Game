@@ -200,12 +200,13 @@ public class BuildingSceneController : MonoBehaviour {
     }
     public void RemoveAllBlocks()
     {
-        foreach (var block in GameController.instance.ActivePlayerBlocks)
+        foreach (var block in BlockContainer.GetComponentsInChildren<BlockBehavior>())
         {
-            if (block.Type != Block.BlockType.Base)
+            if (block.Block.Type != Block.BlockType.Base)
             {
-                GameController.instance.ActivePlayerBlocks.Remove(block);
-                GameController.instance.ActivePlayerState.AddAvailableBlocks(block.Type, 1);
+                GameController.instance.ActivePlayerBlocks.Remove(block.Block);
+                GameController.instance.ActivePlayerState.AddAvailableBlocks(block.Block.Type, 1);
+                Destroy(block.gameObject);
             }
         }
         UpdateButtons();

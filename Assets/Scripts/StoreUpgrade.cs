@@ -34,9 +34,16 @@ public class StoreUpgrade : MonoBehaviour {
         if (AddButton != null)
         {
             bool active = Cost <= GameController.instance.ActivePlayerState.Gold;
-            if (active && AvailableText != null)
+            if (active)
             {
-                active = GameController.instance.ActivePlayerState.GetAvailableBlocks(AvailableType) < MaxAvailable;
+                if (AvailableText != null)
+                {
+                    active = GameController.instance.ActivePlayerState.GetAvailableBlocks(AvailableType) < MaxAvailable;
+                }
+                else
+                {
+                    active = !GameController.instance.ActivePlayerState.Upgrades.Contains(Upgrade);
+                }
             }
             AddButton.gameObject.SetActive(active);
         }

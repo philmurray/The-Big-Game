@@ -16,7 +16,6 @@ public class BuildingBlockBehavior : BlockBehavior {
 
     public void OnMouseDown()
     {
-        Debug.Log("Mouses are down");
         if (Draggable)
         {
             foreach (var b in transform.parent.GetComponentsInChildren<BuildingBlockBehavior>())
@@ -70,7 +69,6 @@ public class BuildingBlockBehavior : BlockBehavior {
 
     public void OnMouseUp()
     {
-        Debug.Log("Mouses are up!");
         if (isDragging)
         {
             isDragging = false;

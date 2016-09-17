@@ -9,6 +9,7 @@ namespace Assets.Scripts.DataStructures
     public class PlayerState
     {
         public int Gold;
+        public int Crystals;
 
         [Serializable]
         public class AvailableBlock
@@ -150,7 +151,7 @@ namespace Assets.Scripts.DataStructures
             }
         }
 
-        internal void RemoveUpgrade(Upgrade upgrade)
+        public void RemoveUpgrade(Upgrade upgrade)
         {
             switch (upgrade)
             {

@@ -114,16 +114,13 @@ public class GameController : MonoBehaviour
         {
             case "MainMenu":
                 SaveState();
-                SceneManager.LoadScene("Upgrades");
-                break;
-            case "Upgrades":
                 SceneManager.LoadScene("Building");
                 break;
             case "Building":
                 if (ActivePlayer == Player.One && PlayerTwo.IsHuman)
                 {
                     ActivePlayer = Player.Two;
-                    SceneManager.LoadScene("Upgrades");
+                    SceneManager.LoadScene("Building");
                 }
                 else
                 {
