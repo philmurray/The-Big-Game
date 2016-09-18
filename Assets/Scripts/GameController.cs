@@ -138,6 +138,8 @@ public class GameController : MonoBehaviour
                 else
                 {
                     RetrieveBlockState();
+                    PlayerOne.State.Gold += 50;
+                    PlayerTwo.State.Gold += 50;
                     SceneManager.LoadScene("Building");
                 }
                 break;
