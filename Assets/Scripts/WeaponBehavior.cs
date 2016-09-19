@@ -25,9 +25,8 @@ public abstract class WeaponBehavior : MonoBehaviour
     public virtual void GetReady() {
         if (Projectile == null)
         {
-            var go = Instantiate(ProjectilePrefab, ProjectileSpawnPoint.position, Quaternion.identity) as GameObject;
+            var go = Instantiate(ProjectilePrefab, ProjectileSpawnPoint, false) as GameObject;
             Projectile = go.GetComponent<ProjectileBehavior>();
-            Projectile.transform.SetParent(transform, true);
 
             Projectile.Weapon = WeaponState;
             Projectile.Player = Player;
