@@ -16,7 +16,7 @@ public class BuildingBlockBehavior : BlockBehavior {
 
     public void OnMouseDown()
     {
-        if (Draggable)
+        if (Draggable && !BuildingSceneController.instance.ShopShowing())
         {
             foreach (var b in transform.parent.GetComponentsInChildren<BuildingBlockBehavior>())
             {

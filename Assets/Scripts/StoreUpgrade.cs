@@ -23,6 +23,7 @@ public class StoreUpgrade : MonoBehaviour {
     void Start()
     {
         CostText.text = Cost > 0 ? Cost.ToString() + " Gold" : "";
+        Refresh();
     }
 
     public void Refresh()
@@ -45,7 +46,7 @@ public class StoreUpgrade : MonoBehaviour {
                     active = !GameController.instance.ActivePlayerState.Upgrades.Contains(Upgrade);
                 }
             }
-            AddButton.gameObject.SetActive(active);
+            AddButton.interactable = active;
         }
         if (RemoveButton != null)
         {

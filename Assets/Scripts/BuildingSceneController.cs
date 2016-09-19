@@ -90,6 +90,11 @@ public class BuildingSceneController : MonoBehaviour {
         ShowShop();
     }
 
+    public bool ShopShowing()
+    {
+        return ShopModal.gameObject.activeSelf;
+    }
+
     public void ShowShop()
     {
         ShopModal.gameObject.SetActive(true);
