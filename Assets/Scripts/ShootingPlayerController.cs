@@ -197,8 +197,7 @@ public class ShootingPlayerController : MonoBehaviour {
         List<FlagBehavior> mods = new List<FlagBehavior>();
         foreach (var mod in BlockContainer.GetComponentsInChildren<FlagBehavior>())
         {
-            var d = mod.GetComponent<Destructable>();
-            if (d == null || !d.Destroyed)
+            if (!mod.Destroyed)
             {
                 mods.Add(mod);
             }
