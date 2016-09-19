@@ -194,8 +194,8 @@ public class ShootingPlayerController : MonoBehaviour {
 
     private void ApplyModifiersToWeapon()
     {
-        List<AffectsWeaponPower> mods = new List<AffectsWeaponPower>();
-        foreach (var mod in BlockContainer.GetComponentsInChildren<AffectsWeaponPower>())
+        List<FlagBehavior> mods = new List<FlagBehavior>();
+        foreach (var mod in BlockContainer.GetComponentsInChildren<FlagBehavior>())
         {
             var d = mod.GetComponent<Destructable>();
             if (d == null || !d.Destroyed)

@@ -36,12 +36,12 @@ public abstract class WeaponBehavior : MonoBehaviour
         WeaponState = weaponState;
     }
 
-    public void ApplyPowerUpgrades(List<AffectsWeaponPower> affectsWeaponPower)
+    public void ApplyPowerUpgrades(List<FlagBehavior> affectsWeaponPower)
     {
         PowerModifier = 1;
         foreach (var a in affectsWeaponPower)
         {
-            PowerModifier += a.PowerAffect;
+            PowerModifier += a.GetPowerAffect(Player);
         }
     }
 }

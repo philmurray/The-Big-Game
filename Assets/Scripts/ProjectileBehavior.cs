@@ -18,9 +18,6 @@ public class ProjectileBehavior : MonoBehaviour {
     private Rigidbody _rigidBody;
     private Vector3 _previousVelocity;
 
-    private float _originalMass;
-    private float _originalDamage;
-
     public float Mass
     {
         get
@@ -39,15 +36,6 @@ public class ProjectileBehavior : MonoBehaviour {
     void Start()
     {
         _rigidBody = GetComponent<Rigidbody>();
-
-        _originalDamage = Damage;
-        if (_rigidBody)
-        {
-            _originalMass = _rigidBody.mass;
-        }
-
-        InitializeMass();
-        InitializeDamage();
     }
 
     void FixedUpdate()
@@ -60,30 +48,30 @@ public class ProjectileBehavior : MonoBehaviour {
 
     void OnCollisionEnter(Collision collision)
     {
-        float changeInVelocity = Vector3.Magnitude((_rigidBody.velocity - _previousVelocity));
-        float force = 0;
-        bool impact = changeInVelocity > 1;
-
-        var destructable = collision.gameObject.GetComponent<Destructable>();
-
-        if (destructable != null)
+        if (_rigidBody != null)
         {
-            if (_rigidBody != null)
+            float changeInVelocity = Vector3.Magnitude((_rigidBody.velocity - _previousVelocity));
+            float force = 0;
+            bool impact = changeInVelocity > 1;
+
+            var destructable = collision.gameObject.GetComponent<Destructable>();
+
+            if (destructable != null)
             {
                 if (impact)
                 {
                     force = changeInVelocity / (Time.fixedDeltaTime * 10) * _rigidBody.mass;
                 }
+
+                var damage = force * Damage;
+                destructable.InflictDamage(damage, collision);
             }
 
-            var damage = force * Damage;
-            destructable.InflictDamage(damage, collision);
-        }
-
-        if (ExplosionForce > 0 && ExplosionActive && impact)
-        {
-            ExplosionActive = false;
-            StartCoroutine(Explosion(collision.contacts[0].point));
+            if (ExplosionForce > 0 && ExplosionActive && impact)
+            {
+                ExplosionActive = false;
+                StartCoroutine(Explosion(collision.contacts[0].point));
+            }
         }
     }
 
@@ -120,34 +108,4 @@ public class ProjectileBehavior : MonoBehaviour {
             }
         }
     }
-
-    private void InitializeMass()
-    {
-        if (_rigidBody != null)
-        {
-            float mass = _originalMass;
-            foreach (var upgradeOptions in GameController.instance.GetPlayer(Player).State.FindUpgradesWithOption("AffectsProjectileMass"))
-            {
-                if (upgradeOptions["AffectsProjectileMass"].Split(' ').Contains(Weapon.Type.ToString()))
-                {
-                    mass *= float.Parse(upgradeOptions["MassModifier"]);
-                }
-            }
-            _rigidBody.mass = mass;
-        }
-    }
-
-    private void InitializeDamage()
-    {
-        float damage = _originalDamage;
-        foreach (var upgradeOptions in GameController.instance.GetPlayer(Player).State.FindUpgradesWithOption("AffectsProjectileDamage"))
-        {
-            if (upgradeOptions["AffectsProjectileDamage"].Split(' ').Contains(Weapon.Type.ToString()))
-            {
-                damage *= float.Parse(upgradeOptions["DamageModifier"]);
-            }
-        }
-        Damage = damage;
-    }
-
 }

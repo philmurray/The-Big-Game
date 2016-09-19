@@ -2,6 +2,7 @@
 using System.Collections;
 using System;
 using Assets.Scripts.DataStructures;
+using System.Linq;
 
 public class CatapultBehavior : WeaponBehavior {
     
@@ -9,6 +10,7 @@ public class CatapultBehavior : WeaponBehavior {
     public Transform BasePosition;
 
     public override ProjectileBehavior Fire() {
+        ApplyMassUpgrades();
         Projectile.Mass *= PowerModifier;
 
         ArmJoint.useSpring = true;
@@ -25,5 +27,13 @@ public class CatapultBehavior : WeaponBehavior {
     private float CatapultPowerConversion()
     {
         return (WeaponState.Power * (3.5f * Projectile.Mass)) + 400 + 975 * Projectile.Mass;
+    }
+
+    private void ApplyMassUpgrades()
+    {
+        foreach (var upgradeOptions in GameController.instance.GetPlayer(Player).State.FindUpgradesWithOption("AffectsCatapultPower"))
+        {
+            PowerModifier += float.Parse(upgradeOptions["AffectsCatapultPower"]);
+        }
     }
 }
