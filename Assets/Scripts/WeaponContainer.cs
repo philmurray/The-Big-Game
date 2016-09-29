@@ -40,7 +40,8 @@ public class WeaponContainer : MonoBehaviour {
         Weapon = weaponObject.GetComponent<WeaponBehavior>();
 
         Weapon.Player = Player;
-        Weapon.SetState(weapon);
+        Weapon.WeaponState = weapon;
+        Weapon.StateUpdated();
         Weapon.GetReady();
     }
 

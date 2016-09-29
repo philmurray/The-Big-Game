@@ -32,9 +32,7 @@ public abstract class WeaponBehavior : MonoBehaviour
             Projectile.Player = Player;
         }
     }
-    public virtual void SetState(Weapon weaponState) {
-        WeaponState = weaponState;
-    }
+    public virtual void StateUpdated() {}
 
     public void ApplyPowerUpgrades(List<FlagBehavior> affectsWeaponPower)
     {

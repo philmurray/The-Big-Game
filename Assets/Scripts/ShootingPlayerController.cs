@@ -190,6 +190,7 @@ public class ShootingPlayerController : MonoBehaviour {
     {
         WeaponRotaterMinor.SetAngle(GameController.instance.GetPlayer(Player).Weapon.MinorHorizontalAngle);
         WeaponRotaterMajor.SetAngle(GameController.instance.GetPlayer(Player).Weapon.MajorHorizontalAngle);
+        WeaponContainer.Weapon.StateUpdated();
     }
 
     private void ApplyModifiersToWeapon()
