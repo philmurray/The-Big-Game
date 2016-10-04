@@ -83,7 +83,13 @@ public class ShootingPlayerController : MonoBehaviour {
         yield return new WaitForSeconds(FireWait);
         var projectile = WeaponContainer.Weapon.Fire();
         yield return new WaitForSeconds(FireCameraWait);
+
         StartProjectileFollow(projectile);
+        if (WeaponContainer.Weapon.WeaponState.Type == Weapon.WeaponType.Crossbow)
+        {
+            ShootingSceneController.instance.OtherPlayer(Player).StartHitting();
+        }
+
         EndShooting();
     }
 

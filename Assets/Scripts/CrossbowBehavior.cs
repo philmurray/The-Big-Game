@@ -19,8 +19,10 @@ public class CrossbowBehavior : WeaponBehavior
 
         Projectile.GetComponent<Rigidbody>().velocity = Projectile.transform.right * BoltSpeed;
 
-        //Projectile.Mass *= PowerModifier;
-        //Projectile.Activate(1);
+        Projectile.Damage *= PowerModifier;
+        Projectile.ExplosionForceModifier = PowerModifier;
+
+        Projectile.Activate(0.05f);
         return base.Fire();
     }
 

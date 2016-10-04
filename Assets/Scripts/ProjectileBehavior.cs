@@ -10,10 +10,10 @@ public class ProjectileBehavior : MonoBehaviour {
     public float Damage;
 
     public bool ExplosionActive;
-    public float ExplosionDelay;
-    public float ExplosionForce;
-    public float ExplosionRadius;
-    public float ExplosionUpwardForce;
+    public Explosion Explosion;
+    public float ExplosionForceModifier;
+    public float ExplosionRadiusModifier;
+    public float ExplosionUpwardForceModifier;
 
     private Rigidbody _rigidBody;
     private Vector3 _previousVelocity;
@@ -67,10 +67,13 @@ public class ProjectileBehavior : MonoBehaviour {
                 destructable.InflictDamage(damage, collision);
             }
 
-            if (ExplosionForce > 0 && ExplosionActive && impact)
+            if (Explosion != null && ExplosionActive && impact)
             {
                 ExplosionActive = false;
-                StartCoroutine(Explosion(collision.contacts[0].point));
+                var exp = Instantiate(Explosion, collision.contacts[0].point, Quaternion.identity) as Explosion;
+                exp.Force *= ExplosionForceModifier;
+                exp.Radius *= ExplosionRadiusModifier;
+                exp.UpwardForce *= ExplosionUpwardForceModifier;
             }
         }
     }
@@ -87,25 +90,5 @@ public class ProjectileBehavior : MonoBehaviour {
     public void Activate(float delay)
     {
         StartCoroutine(_delayedActivate(delay));
-    }
-
-    private IEnumerator Explosion(Vector3 explosionPos)
-    {
-        yield return new WaitForSeconds(ExplosionDelay);
-
-        Collider[] colliders = Physics.OverlapSphere(explosionPos, ExplosionRadius);
-        foreach (Collider hit in colliders)
-        {
-            Rigidbody rb = hit.GetComponent<Rigidbody>();
-            if (rb == null)
-            {
-                rb = hit.GetComponentInParent<Rigidbody>();
-            }
-
-            if (rb != null && rb != _rigidBody)
-            {
-                rb.AddExplosionForce(ExplosionForce, explosionPos, ExplosionRadius, ExplosionUpwardForce);
-            }
-        }
     }
 }
