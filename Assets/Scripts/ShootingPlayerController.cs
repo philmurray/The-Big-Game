@@ -6,6 +6,9 @@ using System.Collections.Generic;
 
 public class ShootingPlayerController : MonoBehaviour {
 
+    public enum Phase { Waiting, Aiming, Shooting, WaitingForProjectile, Resolving };
+    public Phase CurrentPhase;
+
     public GameController.Player Player;
     public BlockContainer BlockContainer;
     public WeaponContainer WeaponContainer;
@@ -22,7 +25,8 @@ public class ShootingPlayerController : MonoBehaviour {
     public Transform HitTarget;
     public float HitTargetDistance;
     public float CrystalZoomSpeed;
-    public float ResolutionTime;
+    public float MaxResolutionTime;
+    public float MinResolutionTime;
     private float _resolutionStartTime;
 
     public Camera ProjectileFollowCamera;
@@ -31,22 +35,21 @@ public class ShootingPlayerController : MonoBehaviour {
 
     void Start() {
         BlockContainer.SetBlocks();
+        CurrentPhase = Phase.Waiting;
     }
 
     void FixedUpdate() {
-        if (_incomingProjectile != null) {
-            if (!HitCamera.CameraEnabled)
+        if (CurrentPhase == Phase.WaitingForProjectile)
+        {
+            var distance = Vector3.Distance(HitTarget.position, _incomingProjectile.transform.position);
+            if (distance < HitTargetDistance)
             {
-                var distance = Vector3.Distance(HitTarget.position, _incomingProjectile.transform.position);
-                if (distance < HitTargetDistance)
-                {
-                    StartHitting();
-                }
+                StartHitting();
             }
-            else
-            {
-                WaitForResolution();
-            }
+        }
+        else if (CurrentPhase == Phase.Resolving)
+        {
+            WaitForResolution();
         }
     }
     public void StartTargeted()
@@ -57,13 +60,16 @@ public class ShootingPlayerController : MonoBehaviour {
 
     public void StartAiming()
     {
+        CurrentPhase = Phase.Aiming;
         AimCamera.enabled = true;
         ToggleBlocks(false);
         ToggleWeapon(true);
         WeaponContainer.SelectWeapon(GameController.instance.GetPlayer(Player).Weapon);
         UpdateWeapon();
     }
-    public void EndAiming() {
+    public void EndAiming()
+    {
+        CurrentPhase = Phase.Waiting;
         ApplyModifiersToWeapon();
         AimCamera.enabled = false;
         ToggleBlocks(true);
@@ -72,6 +78,7 @@ public class ShootingPlayerController : MonoBehaviour {
 
     public void StartShooting()
     {
+        CurrentPhase = Phase.Shooting;
         ToggleBlocks(false);
         ToggleWeapon(true);
         FireCamera.enabled = true;
@@ -95,6 +102,7 @@ public class ShootingPlayerController : MonoBehaviour {
 
     public void EndShooting()
     {
+        CurrentPhase = Phase.Waiting;
         FireCamera.enabled = false;
         ToggleBlocks(true);
         WeaponContainer.RemoveWeapon();
@@ -143,12 +151,14 @@ public class ShootingPlayerController : MonoBehaviour {
 
     public void WaitForProjectile(ProjectileBehavior projectile)
     {
+        CurrentPhase = Phase.WaitingForProjectile;
         _incomingProjectile = projectile;
         _incomingProjectile.transform.SetParent(BlockContainer.transform);
     }
 
     private void StartHitting()
     {
+        CurrentPhase = Phase.Resolving;
         ShootingSceneController.instance.OtherPlayer(Player).StopProjectileFollow();
         HitCamera.CameraEnabled = true;
         _resolutionStartTime = Time.fixedTime;
@@ -156,7 +166,13 @@ public class ShootingPlayerController : MonoBehaviour {
 
     private void WaitForResolution()
     {
-        if (Time.fixedTime - _resolutionStartTime > ResolutionTime)
+        var timePassed = Time.fixedTime - _resolutionStartTime;
+        if (timePassed < MinResolutionTime)
+        {
+            return;
+        }
+
+        if (timePassed > MaxResolutionTime)
         {
             StopHitting();
             return;
@@ -186,6 +202,7 @@ public class ShootingPlayerController : MonoBehaviour {
 
     private void StopHitting()
     {
+        CurrentPhase = Phase.Waiting;
         ShootingSceneController.instance.StopPlayerFiring();
         _incomingProjectile = null;
         HitCamera.Reset();

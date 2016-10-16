@@ -89,6 +89,11 @@ public class ProjectileBehavior : MonoBehaviour {
     }
     public void Activate(float delay)
     {
+        var shatter = GetComponent<Shatter>();
+        if (shatter != null)
+        {
+            shatter.Active = true;
+        }
         StartCoroutine(_delayedActivate(delay));
     }
 }

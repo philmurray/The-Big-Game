@@ -3,6 +3,11 @@ using System.Collections;
 
 public class Shatter : MonoBehaviour {
 
+    public bool Active;
+    public float ShardLifeTime;
+    public float ShardLifeTimeVariance;
+    public float ShardExplosionForce;
+
     private bool isQuitting;
     void OnApplicationQuit()
     {
@@ -11,7 +16,7 @@ public class Shatter : MonoBehaviour {
 
     void OnDestroy()
     {
-        if (!isQuitting)
+        if (Active && !isQuitting)
         {
             MeshFilter MF = GetComponent<MeshFilter>();
             MeshRenderer MR = GetComponent<MeshRenderer>();
@@ -43,18 +48,20 @@ public class Shatter : MonoBehaviour {
                     mesh.triangles = new int[] { 0, 1, 2, 2, 1, 0 };
 
                     GameObject GO = new GameObject("Triangle " + (i / 3));
+                    GO.transform.SetParent(transform.parent);
                     GO.transform.position = transform.position;
                     GO.transform.rotation = transform.rotation;
                     GO.transform.localScale = transform.localScale;
                     GO.AddComponent<MeshRenderer>().material = MR.materials[submesh];
                     GO.AddComponent<MeshFilter>().mesh = mesh;
                     GO.AddComponent<BoxCollider>();
+                    GO.AddComponent<PositionTracker>();
                     var rb = GO.AddComponent<Rigidbody>();
                     rb.velocity = RB.velocity;
                     rb.angularVelocity = RB.angularVelocity;
-                    rb.AddExplosionForce(100, transform.position, 30);
+                    rb.AddExplosionForce(ShardExplosionForce, transform.position, 30);
 
-                    Destroy(GO, 5 + Random.Range(0.0f, 5.0f));
+                    Destroy(GO, ShardLifeTime + Random.Range(0.0f, ShardLifeTimeVariance));
                 }
             }
         }
