@@ -11,23 +11,34 @@ public class Destructable : MonoBehaviour {
     private RealBlockBehavior _blockBehavior;
     private Vector3 _previousVelocity;
 
+    private Rigidbody Rigidbody
+    {
+        get
+        {
+            if (_rigidBody == null)
+            {
+                _rigidBody = GetComponent<Rigidbody>();
+            }
+            return _rigidBody;
+        }
+    }
+
     public virtual void Start ()
     {
-        _rigidBody = GetComponent<Rigidbody>();
         _blockBehavior = GetComponent<RealBlockBehavior>();
     }
 
     void FixedUpdate ()
     {
-        _previousVelocity = _rigidBody.velocity;
+        _previousVelocity = Rigidbody.velocity;
     }
 
     void OnCollisionEnter(Collision collision)
     {
-        var changeInVelocity = Vector3.Magnitude((_rigidBody.velocity - _previousVelocity));
+        var changeInVelocity = Vector3.Magnitude((Rigidbody.velocity - _previousVelocity));
         if (changeInVelocity > 1)
         {
-            var force = changeInVelocity / (Time.fixedDeltaTime * 10) * _rigidBody.mass;
+            var force = changeInVelocity / (Time.fixedDeltaTime * 10) * Rigidbody.mass;
             InflictDamage(force, collision);
 
             var destructable = collision.gameObject.GetComponent<Destructable>();
@@ -36,7 +47,7 @@ public class Destructable : MonoBehaviour {
                 destructable.InflictDamage(force, collision);
             }
 
-            _previousVelocity = _rigidBody.velocity;
+            _previousVelocity = Rigidbody.velocity;
         }
     }
 
